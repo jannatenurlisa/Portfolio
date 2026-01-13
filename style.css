@@ -341,6 +341,12 @@ h3 {
     box-shadow: 0 0 40px rgba(214, 173, 96, 0.6);
 }
 
+.hero-text p {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+
 .hero-text span {
     color: var(--gold);
 }
@@ -437,7 +443,6 @@ h3 {
     text-align: center;
     padding: 20px 10px;
     font-size: 14px;
-    width: 100%;
     color: var(--gold);
     background: rgba(182, 141, 64, 0.05);
     border-top: 1px solid rgba(214, 173, 96, 0.2);
@@ -449,14 +454,16 @@ h3 {
 }
 
 
-
+/* MOBILE HERO STACK */
 @media (max-width: 600px) {
     .hero-card {
         flex-direction: column;
+        /* stack image + text */
         align-items: center;
         padding: 20px;
         gap: 20px;
         text-align: center;
+        /* center heading & text */
     }
 
     .hero-image img {
@@ -474,10 +481,11 @@ h3 {
     }
 }
 
-
+/* NAV BAR FIX */
 @media (max-width: 600px) {
     .nav-list {
         flex-wrap: wrap;
+        /* allow links to wrap */
         justify-content: center;
         gap: 16px;
         padding: 10px 0;
@@ -488,7 +496,7 @@ h3 {
     }
 }
 
-
+/* FOOTER/CREDIT FULL WIDTH */
 footer {
     width: 100%;
     padding: 12px 20px;
