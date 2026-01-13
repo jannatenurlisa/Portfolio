@@ -177,6 +177,13 @@ h3 {
     scroll-margin-top: 70px;
 }
 
+.content-section p,
+.content-section li {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+
 .section-title {
     text-align: center;
     font-size: 36px;
