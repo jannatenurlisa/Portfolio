@@ -1,222 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jannat-E-Nur Lisa — Data Analyst</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:           #0a0a0f;
+    --surface:      #111118;
+    --card:         #13131e;
+    --border:       #2a2a3a;
+    --border-bright:#4a4a6a;
+    --text:         #e8e8f0;
+    --muted:        #7a7a9a;
+    --accent:       #c9f060;   /* lime green   */
+    --accent2:      #a78bfa;   /* soft violet  */
+    --accent3:      #f472b6;   /* pink         */
+    --accent4:      #67e8f9;   /* cyan         */
+  }
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lisa | Portfolio </title>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'DM Mono',monospace; font-size:14px; line-height:1.7;
+    overflow-x:hidden;
+  }
 
-    <!--CSS-->
-    <link rel="stylesheet" href="style.css" />
+  /* canvas sits behind everything */
+  #sparkle-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
 
-    <!--Google Fonts-->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  /* noise grain */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:0.35;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  }
 
+  .wrapper { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:0 28px; }
 
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    border-bottom:1.5px solid var(--border);
+    background:rgba(10,10,15,0.85); backdrop-filter:blur(14px);
+  }
+  nav .wrapper { display:flex; align-items:center; justify-content:space-between; height:58px; }
+  .nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--accent); text-decoration:none; letter-spacing:-0.02em; }
+  .nav-links { display:flex; gap:2px; list-style:none; }
+  .nav-links a {
+    color:var(--muted); text-decoration:none; font-size:11px;
+    letter-spacing:0.08em; text-transform:uppercase;
+    padding:7px 14px; border:1.5px solid transparent; border-radius:8px; transition:all 0.2s;
+  }
+  .nav-links a:hover { color:var(--text); border-color:var(--border-bright); background:rgba(255,255,255,0.03); }
+
+  /* ── GLOW BOX ──
+     Each box gets a ::before for the ambient background glow
+     and a ::after for the border-glow on hover.
+     The actual glow color is set via --glow-color on each element. */
+  .glow-box {
+    position:relative;
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    background:var(--card);
+    transition:border-color 0.3s, transform 0.12s ease-out;
+    will-change:transform;
+    overflow:hidden;        /* keeps the inner glow contained */
+  }
+
+  /* ambient inner glow — always faintly visible, brightens on hover */
+  .glow-box::before {
+    content:'';
+    position:absolute; inset:0;
+    border-radius:14px;
+    background: radial-gradient(ellipse at var(--gx,50%) var(--gy,50%),
+      var(--glow-color, rgba(167,139,250,0.12)) 0%,
+      transparent 70%);
+    opacity:0.6;
+    transition:opacity 0.35s;
+    pointer-events:none;
+    z-index:0;
+  }
+  .glow-box:hover::before { opacity:1; }
+
+  /* border shimmer on hover */
+  .glow-box::after {
+    content:'';
+    position:absolute; inset:-1px;
+    border-radius:14px;
+    background:transparent;
+    box-shadow:inset 0 0 0 1.5px var(--glow-color, rgba(167,139,250,0.35));
+    opacity:0;
+    transition:opacity 0.35s;
+    pointer-events:none;
+    z-index:0;
+  }
+  .glow-box:hover::after { opacity:1; }
+  .glow-box:hover { border-color:var(--border-bright); box-shadow:0 0 32px -8px var(--glow-color, rgba(167,139,250,0.25)); }
+
+  /* all direct children of glow-box need z-index:1 so they sit above the glow layer */
+  .glow-box > * { position:relative; z-index:1; }
+
+  /* ── BTNS ── */
+  .btn {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 24px; border-radius:10px;
+    font-family:'DM Mono',monospace; font-size:13px;
+    text-decoration:none; transition:all 0.25s; cursor:pointer;
+    letter-spacing:0.01em; border:1.5px solid transparent;
+  }
+  .btn-primary { background:var(--accent); color:#0a0a0f; border-color:var(--accent); font-weight:600; }
+  .btn-primary:hover { background:transparent; color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 28px rgba(201,240,96,0.2); }
+  .btn-outline { background:transparent; color:var(--text); border-color:var(--border-bright); }
+  .btn-outline:hover { border-color:var(--accent2); color:var(--accent2); transform:translateY(-2px); }
+
+  /* ── HERO ── */
+  #hero { padding:140px 0 90px; min-height:100vh; display:flex; align-items:center; border-top:none; }
+  .hero-inner { display:grid; grid-template-columns:1fr auto; gap:56px; align-items:center; }
+
+  .hero-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    border:1.5px solid var(--border-bright); border-radius:100px;
+    padding:6px 16px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:28px; background:rgba(255,255,255,0.02);
+  }
+  .hero-tag .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse-dot 2.5s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.75)} }
+
+  .hero-name { font-family:'Instrument Serif',serif; font-size:clamp(50px,6.5vw,84px); line-height:1.0; letter-spacing:-0.03em; margin-bottom:10px; }
+  .hero-name .italic { font-style:italic; color:var(--accent); }
+  .hero-subtitle { font-family:'Syne',sans-serif; font-size:14px; font-weight:600; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:22px; }
+  .hero-bio { font-size:14px; color:#a0a0c0; max-width:540px; line-height:1.9; margin-bottom:36px; }
+  .hero-cta { display:flex; gap:12px; flex-wrap:wrap; }
+
+  /* hero side card */
+  .hero-card { --glow-color:rgba(167,139,250,0.18); padding:28px; min-width:210px; display:flex; flex-direction:column; gap:14px; }
+  .hero-avatar { width:68px; height:68px; border-radius:50%; border:2px solid var(--border-bright); background:linear-gradient(135deg,#a78bfa,#f472b6); display:flex; align-items:center; justify-content:center; font-family:'Instrument Serif',serif; font-size:26px; color:#fff; font-style:italic; }
+  .hero-card-name { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; }
+  .hero-card-role { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+  .divider { height:1px; background:var(--border); }
+  .hero-stat { display:flex; justify-content:space-between; font-size:12px; }
+  .hero-stat-label { color:var(--muted); }
+  .hero-stat-val { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:var(--accent); }
+  .status-badge { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--muted); padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:rgba(201,240,96,0.04); }
+  .status-badge .dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:pulse-dot 2.5s infinite; }
+
+  /* ── SECTIONS ── */
+  section { padding:100px 0; border-top:1.5px solid var(--border); }
+  .section-label { font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); font-family:'DM Mono',monospace; margin-bottom:10px; }
+  .section-title { font-family:'Instrument Serif',serif; font-size:clamp(32px,4vw,50px); line-height:1.1; letter-spacing:-0.02em; margin-bottom:48px; }
+  .section-title .italic { font-style:italic; color:var(--accent2); }
+
+  /* ── MARQUEE ── */
+  .marquee-bar { border-top:1.5px solid var(--border); border-bottom:1.5px solid var(--border); padding:14px 0; overflow:hidden; background:rgba(255,255,255,0.01); }
+  .marquee-track { display:flex; gap:36px; animation:marquee 24s linear infinite; white-space:nowrap; }
+  .marquee-item { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:14px; }
+  .marquee-item .sep { width:4px; height:4px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+  @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+  /* ── EDUCATION BARS ── */
+  .edu-grid { display:flex; flex-direction:column; gap:12px; }
+  .bar { display:flex; align-items:center; gap:20px; padding:20px 26px; }
+  .bar-icon { width:44px; height:44px; border-radius:10px; border:1.5px solid var(--border-bright); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:rgba(255,255,255,0.03); }
+  .bar-body { flex:1; }
+  .bar-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; margin-bottom:2px; }
+  .bar-sub { font-size:12px; color:var(--muted); }
+  .bar-right { text-align:right; font-size:12px; color:var(--muted); flex-shrink:0; }
+  .bar-right .year { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--text); display:block; }
+
+  /* ── EXPERIENCE ── */
+  .exp-grid { display:flex; flex-direction:column; gap:16px; }
+  .exp-box { padding:28px 32px; }
+  .exp-box::before { content:''; position:absolute!important; left:0; top:0; bottom:0; width:3px; z-index:2!important; border-radius:3px 0 0 3px; background:linear-gradient(to bottom,var(--accent2),var(--accent3)); }
+  .exp-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:16px; flex-wrap:wrap; }
+  .exp-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:3px; }
+  .exp-org { font-size:13px; color:var(--accent2); }
+  .exp-date { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:6px; padding:4px 10px; white-space:nowrap; }
+  .exp-desc { font-size:13px; color:#8888aa; line-height:1.8; }
+
+  /* ── SKILLS ── */
+  .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  .skill-box { padding:24px; }
+  .skill-box-title { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .skill-pills { display:flex; flex-wrap:wrap; gap:7px; }
+  .pill { font-size:12px; padding:5px 12px; border-radius:7px; border:1.5px solid var(--border); color:var(--text); background:rgba(255,255,255,0.02); transition:all 0.2s; cursor:default; }
+  .pill:hover { transform:translateY(-1px); }
+  .pill.c1 { border-color:rgba(201,240,96,0.4); color:var(--accent);  background:rgba(201,240,96,0.07); }
+  .pill.c2 { border-color:rgba(167,139,250,0.4); color:var(--accent2); background:rgba(167,139,250,0.07); }
+  .pill.c3 { border-color:rgba(244,114,182,0.4); color:var(--accent3); background:rgba(244,114,182,0.07); }
+  .pill.c4 { border-color:rgba(103,232,249,0.4); color:var(--accent4); background:rgba(103,232,249,0.07); }
+
+  /* ── PROJECTS ── */
+  .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:20px; }
+  .project-card { padding:32px; display:flex; flex-direction:column; gap:16px; text-decoration:none; color:inherit; }
+
+  /* top gradient bar that appears on hover */
+  .project-card > .top-bar {
+    position:absolute; top:0; left:0; right:0; height:2px; z-index:3;
+    border-radius:14px 14px 0 0;
+    background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+    opacity:0; transition:opacity 0.3s;
+  }
+  .project-card:hover > .top-bar { opacity:1; }
+
+  .project-num { font-family:'Instrument Serif',serif; font-size:44px; font-style:italic; color:rgba(255,255,255,0.04); line-height:1; position:absolute; top:20px; right:24px; z-index:2; }
+  .project-tags { display:flex; gap:6px; flex-wrap:wrap; }
+  .project-tag { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:3px 9px; border-radius:5px; border:1px solid var(--border-bright); color:var(--muted); }
+  .project-title { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; line-height:1.3; color:var(--text); }
+  .project-desc { font-size:13px; color:var(--muted); line-height:1.85; flex:1; }
+
+  .findings { display:flex; flex-direction:column; gap:9px; margin-top:4px; }
+  .finding { display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--muted); line-height:1.6; }
+  .finding-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:6px; }
+
+  .project-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border); font-size:12px; margin-top:auto; }
+  .project-link { display:flex; align-items:center; gap:6px; color:var(--accent); font-weight:500; text-decoration:none; transition:gap 0.2s; }
+  .project-link:hover { gap:10px; }
+  .project-status { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:5px; padding:3px 9px; }
+  .project-status.done { color:#6ee7b7; border-color:rgba(110,231,183,0.4); background:rgba(110,231,183,0.06); }
+  .project-status.wip  { color:var(--accent2); border-color:rgba(167,139,250,0.4); background:rgba(167,139,250,0.06); }
+  .project-card.placeholder { border-style:dashed; opacity:0.5; }
+
+  /* ── CONTACT ── */
+  .contact-inner { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+  .contact-links { display:flex; flex-direction:column; gap:12px; }
+  .contact-link { display:flex; align-items:center; gap:16px; padding:16px 20px; text-decoration:none; color:var(--text); transition:transform 0.25s; }
+  .contact-link:hover { transform:translateX(5px); }
+  .contact-link .ico { width:38px; height:38px; border-radius:9px; background:rgba(255,255,255,0.03); border:1.5px solid var(--border-bright); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .link-title { font-family:'Syne',sans-serif; font-weight:600; font-size:13px; margin-bottom:2px; }
+  .link-val { font-size:12px; color:var(--muted); }
+  .contact-right { --glow-color:rgba(201,240,96,0.14); padding:36px; }
+  .contact-right-title { font-family:'Instrument Serif',serif; font-size:28px; margin-bottom:12px; font-style:italic; }
+  .contact-right-text { font-size:13px; color:var(--muted); line-height:1.85; margin-bottom:24px; }
+
+  /* ── FOOTER ── */
+  footer { padding:32px 0; border-top:1.5px solid var(--border); }
+  footer .wrapper { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); }
+  footer .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color:var(--accent); }
+
+  /* ── FADE IN ── */
+  .fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.65s ease, transform 0.65s ease; }
+  .fade-up.visible { opacity:1; transform:translateY(0); }
+
+  @media(max-width:768px){
+    .hero-inner{ grid-template-columns:1fr; }
+    .hero-card{ display:none; }
+    .contact-inner{ grid-template-columns:1fr; }
+    .nav-links{ display:none; }
+  }
+</style>
 </head>
-
-
 <body>
-    <div class="sparkles"></div>
 
-    <header class="top-bar">
-        <div class="brand-name">Jannat-E-Nur</div>
-        <div class="topbar-contacts">
-            <a href="mailto:jannatenurlisa@gmail.com" class="contact-item">
-                <i class="fa-solid fa-envelope icon"></i>
-                <span class="label">E-mail</span>
-            </a>
+<canvas id="sparkle-canvas"></canvas>
 
-            <a href="https://github.com/jannatenurlisa" target="_blank" class="contact-item">
-                <i class="fa-brands fa-github icon"></i>
-                <span class="label">Github</span>
-            </a>
+<!-- NAV -->
+<nav>
+  <div class="wrapper">
+    <a href="#hero" class="nav-logo">Lisa ✦</a>
+    <ul class="nav-links">
+      <li><a href="#education">Education</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="btn btn-primary" style="padding:8px 18px;font-size:12px;">Say Hello →</a>
+  </div>
+</nav>
 
-            <a href="https://www.linkedin.com/in/jannatenurlisa/" target="_blank" class="contact-item">
-                <i class="fa-brands fa-linkedin icon"></i>
-                <span class="label">Linkedin</span>
-            </a>
-
-            <a href="assets/resume.pdf" download class="contact-item" title="Click to download the resume">
-                <i class="fa-solid fa-file icon"></i>
-                <span class="label">Resume</span>
-            </a>
-
-
-
+<!-- HERO -->
+<section id="hero">
+  <div class="wrapper">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag fade-up"><span class="dot"></span>Open to opportunities</div>
+        <h1 class="hero-name fade-up">Jannat&#8209;E&#8209;Nur<br/><span class="italic">Lisa.</span></h1>
+        <p class="hero-subtitle fade-up">Data Analyst · CSE Graduate</p>
+        <p class="hero-bio fade-up">Computer Science &amp; Engineering graduate passionate about data analytics in the business domain. I explore how data decodes customer decisions, surfaces hidden patterns, and shapes human-centered strategies — where numbers meet people.</p>
+        <div class="hero-cta fade-up">
+          <a href="#projects" class="btn btn-primary">View Projects →</a>
+          <a href="#contact"  class="btn btn-outline">Get in Touch</a>
         </div>
-    </header>
-
-
-
-
-    <!--HERO-->
-    <section id="hero">
-        <div class="hero-card">
-            <div class="hero-text">
-                <h1>Hello there, <span>Lisa</span> here.</h1>
-                <p>
-                    I’m a Computer Science & Engineering graduate interested in data analytics within the business
-                    domain,
-                    with a growing curiosity about consumer psychology and human behavior. I enjoy exploring how data
-                    can be
-                    used to understand customer decisions, improve products, and support more thoughtful, human-centered
-                    business strategies.
-                </p>
-            </div>
-
-            <div class="hero-image">
-                <img src="./assets/images/lisa.png" alt="Lisa profile photo">
-            </div>
+      </div>
+      <div class="hero-card glow-box fade-up">
+        <div class="hero-avatar">L</div>
+        <div>
+          <div class="hero-card-name">Jannat-E-Nur</div>
+          <div class="hero-card-role">Data Analyst</div>
         </div>
-    </section>
+        <div class="divider"></div>
+        <div class="hero-stat"><span class="hero-stat-label">Degree</span><span class="hero-stat-val">B.Sc. CSE</span></div>
+        <div class="hero-stat"><span class="hero-stat-label">Graduated</span><span class="hero-stat-val">Feb 2026</span></div>
+        <div class="hero-stat"><span class="hero-stat-label">Focus</span><span class="hero-stat-val">Business Analytics</span></div>
+        <div class="divider"></div>
+        <div class="status-badge"><span class="dot"></span>Building portfolio projects</div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- MARQUEE -->
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span class="marquee-item">Python <span class="sep"></span></span>
+    <span class="marquee-item">SQL <span class="sep"></span></span>
+    <span class="marquee-item">Pandas <span class="sep"></span></span>
+    <span class="marquee-item">Seaborn <span class="sep"></span></span>
+    <span class="marquee-item">Behavioral Analytics <span class="sep"></span></span>
+    <span class="marquee-item">Data Storytelling <span class="sep"></span></span>
+    <span class="marquee-item">Google Sheets <span class="sep"></span></span>
+    <span class="marquee-item">NumPy <span class="sep"></span></span>
+    <span class="marquee-item">Consumer Psychology <span class="sep"></span></span>
+    <span class="marquee-item">Matplotlib <span class="sep"></span></span>
+    <span class="marquee-item">Business Intelligence <span class="sep"></span></span>
+    <span class="marquee-item">Python <span class="sep"></span></span>
+    <span class="marquee-item">SQL <span class="sep"></span></span>
+    <span class="marquee-item">Pandas <span class="sep"></span></span>
+    <span class="marquee-item">Seaborn <span class="sep"></span></span>
+    <span class="marquee-item">Behavioral Analytics <span class="sep"></span></span>
+    <span class="marquee-item">Data Storytelling <span class="sep"></span></span>
+    <span class="marquee-item">Google Sheets <span class="sep"></span></span>
+    <span class="marquee-item">NumPy <span class="sep"></span></span>
+    <span class="marquee-item">Consumer Psychology <span class="sep"></span></span>
+    <span class="marquee-item">Matplotlib <span class="sep"></span></span>
+    <span class="marquee-item">Business Intelligence <span class="sep"></span></span>
+  </div>
+</div>
 
-    <!--NAVIGATION -->
-    <nav id="navigation">
-        <ul class="nav-list">
-            <li><a href="#education" class="gold-hover">Education</a></li>
-            <li><a href="#experience" class="gold-hover">Experience</a></li>
-            <li><a href="#skills" class="gold-hover">Skills</a></li>
-            <li><a href="#projects" class="gold-hover">Projects</a></li>
-        </ul>
-    </nav>
-
-
-
-    <!--EDUCATION-->
-    <section id="education" class="content-section">
-        <h2 class="section-title">Education</h2>
-        <div class="card">
-            <h3>B.Sc. in Computer Science & Engineering</h3>
-            <p class="meta">European University of Bangladesh</p>
-            <p class="description">
-                Dhaka, Bangladesh
-            </p>
-
-            <h3>Higher Secondary Certificate (HSC)</h3>
-            <p class="meta">Dhamrai Hardinge High School & College</p>
-            <p class="description">
-                Dhaka, Bangladesh
-            </p>
-
-            <h3>Secondary School Certificate (SSC)</h3>
-            <p class="meta">Jyoti Vidya Niketon</p>
-            <p class="description">
-                Dhaka, Bangladesh
-            </p>
+<!-- EDUCATION -->
+<section id="education">
+  <div class="wrapper">
+    <p class="section-label fade-up">// 01 — Education</p>
+    <h2 class="section-title fade-up">Where it all <span class="italic">began.</span></h2>
+    <div class="edu-grid">
+      <div class="bar glow-box fade-up" style="--glow-color:rgba(167,139,250,0.18)">
+        <div class="bar-icon">🎓</div>
+        <div class="bar-body">
+          <div class="bar-title">B.Sc. in Computer Science &amp; Engineering</div>
+          <div class="bar-sub">European University of Bangladesh · Dhaka, Bangladesh</div>
         </div>
-    </section>
-
-
-
-    <!--EXPERIENCE-->
-    <section id="experience" class="content-section">
-        <h2 class="section-title">Experience</h2>
-        <div class="card">
-            <h2>Planning & Development Intern</h2>
-            <p class="meta">European University of Bangladesh · Mar 2025 – Aug 2025</p>
-            <p class="description">
-                Supported strategic planning initiatives, collected and compiled data from multiple departments,
-                conducted usability testing of the university website, and coordinated with faculty, staff, and
-                vendors.
-            </p>
-
-            <h3>Campus Ambassador / Volunteer</h3>
-            <p class="meta">UNDP Future Nation Project</p>
-            <p class="description">
-                Represented UNDP on campus, promoted initiatives and programs, engaged students in awareness
-                campaigns,
-                and built networks between UNDP and the university community.
-            </p>
+        <div class="bar-right"><span class="year">Feb 2026</span><span>CSE</span></div>
+      </div>
+      <div class="bar glow-box fade-up" style="--glow-color:rgba(103,232,249,0.15)">
+        <div class="bar-icon">📚</div>
+        <div class="bar-body">
+          <div class="bar-title">Higher Secondary Certificate (HSC)</div>
+          <div class="bar-sub">Dhamrai Hardinge High School &amp; College · Dhaka, Bangladesh</div>
         </div>
-
-    </section>
-
-
-
-    <!--SKILLS-->
-    <section id="skills" class="content-section">
-        <h2 class="section-title">Skills</h2>
-
-        <div class="skills-grid">
-            <div class="skill-card">
-                <h3>Technical Skills</h3>
-                <ul>
-                    <li>Python (Pandas, NumPy, Matplotlib)</li>
-                    <li>SQL</li>
-                    <li>Excel (Pivot Tables, Formulas, Charts)</li>
-                    <li>Data Collection, Cleaning & Visualization</li>
-                    <li>File & Data Management</li>
-                    <li>Report Writing & Documentation</li>
-                </ul>
-            </div>
-
-            <div class="skill-card">
-                <h3>Professional Skills</h3>
-                <ul>
-                    <li>Project Coordination & Team Management</li>
-                    <li>Problem Solving & Critical Thinking</li>
-                    <li>Adaptability & Time Management</li>
-                    <li>Interpersonal Understanding</li>
-                    <li>Empathetic Communication & Peer Support</li>
-                </ul>
-            </div>
+        <div class="bar-right"><span class="year">Science</span></div>
+      </div>
+      <div class="bar glow-box fade-up" style="--glow-color:rgba(244,114,182,0.15)">
+        <div class="bar-icon">🏫</div>
+        <div class="bar-body">
+          <div class="bar-title">Secondary School Certificate (SSC)</div>
+          <div class="bar-sub">Jyoti Vidya Niketon · Dhaka, Bangladesh</div>
         </div>
-    </section>
+        <div class="bar-right"><span class="year">Science</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-
-
-    <!--PROJECTS-->
-    <section id="projects" class="content-section">
-        <h2 class="section-title">Projects</h2>
-
-        <div class="projects-grid">
-
-            <a href="https://github.com/jannatenurlisa/Predict-the-Next-Best-Selling-Product" target="_blank"
-                class="project-card">
-
-                <h3>Predict the Next Best-Selling Product</h3>
-                <p>
-                    Sales data analysis project using Python, SQL, and Google Sheets to explore
-                    historical trends, clean datasets, and predict top-selling products with
-                    clear business-focused visualizations.
-                </p>
-
-            </a>
-
-            <a href="https://github.com/jannatenurlisa/Personal-Wellness-Productivity-Dashboard" target="_blank"
-                class="project-card">
-
-                <h3>Personal Wellness & Productivity Dashboard</h3>
-                <p>
-                    Analyzed personal habits, mood, and productivity using Python and SQL
-                    to uncover behavioral patterns and support better well-being decisions.
-                </p>
-
-            </a>
-
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrapper">
+    <p class="section-label fade-up">// 02 — Experience</p>
+    <h2 class="section-title fade-up">Real-world <span class="italic">work.</span></h2>
+    <div class="exp-grid">
+      <div class="exp-box glow-box fade-up" style="--glow-color:rgba(167,139,250,0.14)">
+        <div class="exp-header">
+          <div>
+            <div class="exp-title">Planning &amp; Development Intern</div>
+            <div class="exp-org">European University of Bangladesh</div>
+          </div>
+          <div class="exp-date">Mar 2025 – Aug 2025</div>
         </div>
+        <p class="exp-desc">Supported strategic planning initiatives across departments. Collected, compiled, and organized institutional data to assist decision-making. Conducted usability testing of the university website and coordinated with faculty, staff, and external vendors to streamline workflows.</p>
+      </div>
+      <div class="exp-box glow-box fade-up" style="--glow-color:rgba(103,232,249,0.12)">
+        <div class="exp-header">
+          <div>
+            <div class="exp-title">Campus Ambassador &amp; Volunteer</div>
+            <div class="exp-org">UNDP Future Nation Project</div>
+          </div>
+          <div class="exp-date">Volunteer</div>
+        </div>
+        <p class="exp-desc">Represented UNDP on campus, promoted sustainability and development initiatives, engaged students in awareness campaigns, and built networks between UNDP and the university community.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    </section>
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrapper">
+    <p class="section-label fade-up">// 03 — Skills</p>
+    <h2 class="section-title fade-up">Tools of the <span class="italic">trade.</span></h2>
+    <div class="skills-grid">
+      <div class="skill-box glow-box fade-up" style="--glow-color:rgba(201,240,96,0.14)">
+        <div class="skill-box-title"><span>🐍</span> Languages</div>
+        <div class="skill-pills"><span class="pill c1">Python</span><span class="pill c1">SQL</span></div>
+      </div>
+      <div class="skill-box glow-box fade-up" style="--glow-color:rgba(167,139,250,0.16)">
+        <div class="skill-box-title"><span>📦</span> Python Libraries</div>
+        <div class="skill-pills"><span class="pill c2">Pandas</span><span class="pill c2">NumPy</span><span class="pill c2">Matplotlib</span><span class="pill c2">Seaborn</span></div>
+      </div>
+      <div class="skill-box glow-box fade-up" style="--glow-color:rgba(103,232,249,0.13)">
+        <div class="skill-box-title"><span>📊</span> Data &amp; Analytics</div>
+        <div class="skill-pills"><span class="pill c4">Data Cleaning</span><span class="pill c4">Data Analysis</span><span class="pill c4">Data Visualization</span><span class="pill c4">Excel / Google Sheets</span></div>
+      </div>
+      <div class="skill-box glow-box fade-up" style="--glow-color:rgba(244,114,182,0.14)">
+        <div class="skill-box-title"><span>💼</span> Professional</div>
+        <div class="skill-pills"><span class="pill c3">Project Coordination</span><span class="pill c3">Critical Thinking</span><span class="pill c3">Report Writing</span><span class="pill c3">Communication</span></div>
+      </div>
+      <div class="skill-box glow-box fade-up" style="--glow-color:rgba(167,139,250,0.13)">
+        <div class="skill-box-title"><span>🛠️</span> Tools &amp; Environment</div>
+        <div class="skill-pills"><span class="pill">VS Code</span><span class="pill">GitHub</span><span class="pill">SQLite</span><span class="pill">Google Sheets</span><span class="pill">Jupyter Notebooks</span></div>
+      </div>
+      <div class="skill-box glow-box fade-up" style="--glow-color:rgba(201,240,96,0.12)">
+        <div class="skill-box-title"><span>🔍</span> Domain Interest</div>
+        <div class="skill-pills"><span class="pill c1">Business Analytics</span><span class="pill c1">Consumer Psychology</span><span class="pill c1">Human Behavior</span><span class="pill c1">Behavioral Data</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="wrapper">
+    <p class="section-label fade-up">// 04 — Projects</p>
+    <h2 class="section-title fade-up">Things I've <span class="italic">built.</span></h2>
+    <div class="projects-grid">
 
+      <a href="https://github.com/jannatenurlisa/Ecommerce-Churn-Analysis" target="_blank"
+         class="project-card glow-box fade-up"
+         style="--glow-color:rgba(201,240,96,0.13)">
+        <div class="top-bar"></div>
+        <span class="project-num">01</span>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">Pandas</span>
+          <span class="project-tag">Seaborn</span>
+          <span class="project-tag">Behavioral Segmentation</span>
+        </div>
+        <div class="project-title">E-Commerce Churn Analysis</div>
+        <p class="project-desc">Analyzed 7 months of clickstream data (74,817 events · 1,000 users) to identify at-risk users <em>before</em> they fully churn — surfacing signals that spend-based monitoring misses entirely.</p>
+        <div class="findings">
+          <div class="finding">
+            <div class="finding-dot" style="background:var(--accent)"></div>
+            <span>At-risk users spend only $11 less than active users — invisible to spend monitoring alone</span>
+          </div>
+          <div class="finding">
+            <div class="finding-dot" style="background:var(--accent2)"></div>
+            <span>186 "Quiet Loyal" users purchase above median frequency despite low activity; 2 are top-10 spenders</span>
+          </div>
+          <div class="finding">
+            <div class="finding-dot" style="background:var(--accent3)"></div>
+            <span>Intervention window is only 15 days — 7-day inactivity flagging is the only reliable early signal</span>
+          </div>
+        </div>
+        <div class="project-footer">
+          <span class="project-link">View on GitHub →</span>
+          <span class="project-status done">Completed</span>
+        </div>
+      </a>
 
+      <div class="project-card glow-box placeholder fade-up" style="--glow-color:rgba(167,139,250,0.12)">
+        <div class="top-bar"></div>
+        <span class="project-num">02</span>
+        <div class="project-tags"><span class="project-tag">SQL</span><span class="project-tag">Coming Soon</span></div>
+        <div class="project-title">SQL Project</div>
+        <p class="project-desc">An upcoming SQL-focused data analysis project is currently in progress. Check back soon.</p>
+        <div class="project-footer">
+          <span style="color:var(--muted);font-size:12px;">— In progress —</span>
+          <span class="project-status wip">Coming Soon</span>
+        </div>
+      </div>
 
-    <!--JS-->
-    <script src="script.js"></script>
+    </div>
+  </div>
+</section>
 
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrapper">
+    <p class="section-label fade-up">// 05 — Contact</p>
+    <h2 class="section-title fade-up">Let's <span class="italic">connect.</span></h2>
+    <div class="contact-inner">
+      <div class="contact-links fade-up">
+        <a href="mailto:jannatenurlisa@gmail.com" class="contact-link glow-box" style="--glow-color:rgba(201,240,96,0.12)">
+          <div class="ico">✉️</div><div><div class="link-title">Email</div><div class="link-val">jannatenurlisa@gmail.com</div></div>
+        </a>
+        <a href="https://github.com/jannatenurlisa" target="_blank" class="contact-link glow-box" style="--glow-color:rgba(103,232,249,0.12)">
+          <div class="ico">🐙</div><div><div class="link-title">GitHub</div><div class="link-val">github.com/jannatenurlisa</div></div>
+        </a>
+        <a href="https://www.linkedin.com/in/jannatenurlisa/" target="_blank" class="contact-link glow-box" style="--glow-color:rgba(167,139,250,0.13)">
+          <div class="ico">💼</div><div><div class="link-title">LinkedIn</div><div class="link-val">linkedin.com/in/jannatenurlisa</div></div>
+        </a>
+      </div>
+      <div class="contact-right glow-box fade-up">
+        <div class="contact-right-title">Open to work &amp; collaboration.</div>
+        <p class="contact-right-text">I'm actively looking for data analyst roles and freelance opportunities. I'm especially drawn to projects at the intersection of data and human behavior — consumer research, behavioral analytics, and business intelligence.<br/><br/>Feel free to reach out if you'd like to collaborate, chat about data, or explore what we could build together.</p>
+        <a href="mailto:jannatenurlisa@gmail.com" class="btn btn-primary">Send a Message →</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!--FOOTER / CREDIT-->
-    <footer class="footer">
-        <p>© 2026 Jannat-E-Nur | Built with ❤️‍🩹 by Lisa</p>
-    </footer>
+<!-- FOOTER -->
+<footer>
+  <div class="wrapper">
+    <span class="logo">Lisa ✦</span>
+    <span>© 2026 Jannat-E-Nur · Built with intention.</span>
+    <span style="color:var(--accent)">Dhaka, Bangladesh 🌿</span>
+  </div>
+</footer>
 
+<script>
+// ── SPARKLE CANVAS ──
+const canvas = document.getElementById('sparkle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+const COLS = ['rgba(201,240,96,','rgba(167,139,250,','rgba(244,114,182,','rgba(103,232,249,','rgba(255,255,255,'];
+function mkP(){
+  return { x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+0.2,
+    alpha:Math.random()*0.6+0.1, speed:Math.random()*0.25+0.04,
+    drift:(Math.random()-0.5)*0.15, tw:Math.random()*0.018+0.004,
+    col:COLS[Math.floor(Math.random()*COLS.length)] };
+}
+function init(){ particles = Array.from({length:120},mkP); }
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.col+p.alpha+')'; ctx.fill();
+    p.y-=p.speed; p.x+=p.drift;
+    p.alpha+=(Math.random()-0.5)*p.tw;
+    p.alpha=Math.max(0.05,Math.min(0.8,p.alpha));
+    if(p.y<-4){ p.y=H+4; p.x=Math.random()*W; }
+  });
+  requestAnimationFrame(draw);
+}
+resize(); init(); draw();
+addEventListener('resize',resize);
 
+// ── SCROLL FADE ──
+const obs = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.08});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+// ── GLOW BOX: tilt + magnetic cursor + dynamic glow origin ──
+document.querySelectorAll('.glow-box').forEach(box=>{
+  box.addEventListener('mousemove', e=>{
+    const r  = box.getBoundingClientRect();
+    const dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
+    const dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
+    // tilt
+    box.style.transform = `perspective(700px) rotateX(${dy*-6}deg) rotateY(${dx*6}deg) translate(${dx*5}px,${dy*5}px)`;
+    // move glow origin to follow cursor
+    const gx = ((e.clientX - r.left) / r.width  * 100).toFixed(1)+'%';
+    const gy = ((e.clientY - r.top)  / r.height * 100).toFixed(1)+'%';
+    box.style.setProperty('--gx', gx);
+    box.style.setProperty('--gy', gy);
+  });
+  box.addEventListener('mouseleave',()=>{
+    box.style.transform='';
+    box.style.removeProperty('--gx');
+    box.style.removeProperty('--gy');
+  });
+});
+</script>
 </body>
-
 </html>
