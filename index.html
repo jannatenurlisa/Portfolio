@@ -1,265 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Jannat-E-Nur Lisa — Data Analyst</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg:           #0a0a0f;
-    --surface:      #111118;
-    --card:         #13131e;
-    --border:       #2a2a3a;
-    --border-bright:#4a4a6a;
-    --text:         #e8e8f0;
-    --muted:        #7a7a9a;
-    --accent:       #c9f060;
-    --accent2:      #a78bfa;
-    --accent3:      #f472b6;
-    --accent4:      #67e8f9;
-  }
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
 
-  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-  html { scroll-behavior:smooth; }
-  body {
-    background:var(--bg); color:var(--text);
-    font-family:'DM Mono',monospace; font-size:14px; line-height:1.7;
-    overflow-x:hidden;
-  }
+body {
+  background:#0d0608;
+  color:#f0e4e8;
+  font-family:'DM Mono',monospace;
+  font-size:14px;
+  line-height:1.7;
+  overflow-x:hidden;
+}
 
-  #sparkle-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
+/* sparkle canvas */
+#sparkle-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; }
 
-  body::before {
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:0.35;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
-  }
+.wrapper { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:0 28px; }
 
-  .wrapper { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:0 28px; }
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  border-bottom:1.5px solid #2e1820;
+  background:rgba(13,6,8,0.92);
+  backdrop-filter:blur(14px);
+}
+nav .wrapper { display:flex; align-items:center; justify-content:space-between; height:58px; }
+.nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:#c0152a; text-decoration:none; }
+.nav-links { display:flex; gap:2px; list-style:none; }
+.nav-links a {
+  color:#8a6470; text-decoration:none; font-size:11px;
+  letter-spacing:0.08em; text-transform:uppercase;
+  padding:7px 14px; border:1.5px solid transparent; border-radius:8px; transition:all 0.2s;
+}
+.nav-links a:hover { color:#f0e4e8; border-color:#5a2a38; }
 
-  /* ── NAV ── */
-  nav {
-    position:fixed; top:0; left:0; right:0; z-index:100;
-    border-bottom:1.5px solid var(--border);
-    background:rgba(10,10,15,0.88); backdrop-filter:blur(14px);
-  }
-  nav .wrapper { display:flex; align-items:center; justify-content:space-between; height:58px; }
-  .nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--accent); text-decoration:none; }
-  .nav-links { display:flex; gap:2px; list-style:none; }
-  .nav-links a {
-    color:var(--muted); text-decoration:none; font-size:11px;
-    letter-spacing:0.08em; text-transform:uppercase;
-    padding:7px 14px; border:1.5px solid transparent; border-radius:8px; transition:all 0.2s;
-  }
-  .nav-links a:hover { color:var(--text); border-color:var(--border-bright); background:rgba(255,255,255,0.03); }
+/* ── GLOW BOXES ── each gets a unique class with its vinyl color baked in */
+.box {
+  position:relative;
+  border:1.5px solid #2e1820;
+  border-radius:14px;
+  overflow:hidden;
+  transition:transform 0.12s ease-out, border-color 0.3s, box-shadow 0.3s;
+  will-change:transform;
+}
+.box:hover { border-color:#5a2a38; }
 
-  /* ── GLOW BOX ──
-     --gc = glow color, set per element via inline style
-     ::before = big ambient glow that bleeds outside via negative inset
-     ::after  = inner border shimmer on hover
-     overflow:visible on the element so the outer glow isn't clipped
-  */
-  .glow-box {
-    position:relative;
-    border:1.5px solid var(--border);
-    border-radius:14px;
-    background:var(--card);
-    overflow:visible;
-    transition:border-color 0.35s, box-shadow 0.35s, transform 0.12s ease-out;
-    will-change:transform;
-  }
-  /* outer ambient background glow */
-  .glow-box::before {
-    content:'';
-    position:absolute;
-    inset:-20px;
-    border-radius:24px;
-    background: radial-gradient(
-      ellipse at var(--gx,50%) var(--gy,50%),
-      var(--gc, rgba(167,139,250,0.30)) 0%,
-      transparent 65%
-    );
-    opacity:0.55;
-    transition:opacity 0.4s;
-    pointer-events:none;
-    z-index:-1;
-    filter:blur(8px);
-  }
-  .glow-box:hover::before { opacity:1; }
-  /* inner border shimmer */
-  .glow-box::after {
-    content:'';
-    position:absolute; inset:0; border-radius:14px;
-    box-shadow:inset 0 0 0 1px var(--gc, rgba(167,139,250,0.45));
-    opacity:0; transition:opacity 0.35s; pointer-events:none; z-index:1;
-  }
-  .glow-box:hover::after { opacity:1; }
-  .glow-box:hover {
-    border-color:var(--border-bright);
-    box-shadow:0 0 48px -12px var(--gc, rgba(167,139,250,0.45)),
-               0 8px 32px rgba(0,0,0,0.6);
-  }
+/* each vinyl color variant — background glow always visible */
+.box-red     { background:radial-gradient(ellipse at 50% 30%, rgba(192,21,42,0.28) 0%, #180c10 65%); }
+.box-pink    { background:radial-gradient(ellipse at 50% 30%, rgba(232,25,122,0.28) 0%, #180c10 65%); }
+.box-silver  { background:radial-gradient(ellipse at 50% 30%, rgba(184,184,204,0.22) 0%, #180c10 65%); }
+.box-clear   { background:radial-gradient(ellipse at 50% 30%, rgba(210,228,240,0.18) 0%, #180c10 65%); }
+.box-magenta { background:radial-gradient(ellipse at 50% 30%, rgba(196,22,110,0.28) 0%, #180c10 65%); }
+.box-purple  { background:radial-gradient(ellipse at 50% 30%, rgba(123,47,160,0.28) 0%, #180c10 65%); }
+.box-splat   { background:radial-gradient(ellipse at 50% 30%, rgba(232,92,138,0.28) 0%, #180c10 65%); }
 
-  /* ── BTNS ── */
-  .btn {
-    display:inline-flex; align-items:center; gap:8px;
-    padding:12px 24px; border-radius:10px;
-    font-family:'DM Mono',monospace; font-size:13px;
-    text-decoration:none; transition:all 0.25s; cursor:pointer;
-    letter-spacing:0.01em; border:1.5px solid transparent;
-  }
-  .btn-primary { background:var(--accent); color:#0a0a0f; border-color:var(--accent); font-weight:600; }
-  .btn-primary:hover { background:transparent; color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 28px rgba(201,240,96,0.25); }
-  .btn-outline { background:transparent; color:var(--text); border-color:var(--border-bright); }
-  .btn-outline:hover { border-color:var(--accent2); color:var(--accent2); transform:translateY(-2px); }
+/* hover intensifies the glow and adds outer shadow */
+.box-red:hover     { box-shadow:0 0 48px -8px rgba(192,21,42,0.6),  0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(192,21,42,0.45) 0%, #180c10 60%); }
+.box-pink:hover    { box-shadow:0 0 48px -8px rgba(232,25,122,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(232,25,122,0.45) 0%, #180c10 60%); }
+.box-silver:hover  { box-shadow:0 0 48px -8px rgba(184,184,204,0.5),0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(184,184,204,0.38) 0%, #180c10 60%); }
+.box-clear:hover   { box-shadow:0 0 48px -8px rgba(210,228,240,0.45),0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(210,228,240,0.32) 0%, #180c10 60%); }
+.box-magenta:hover { box-shadow:0 0 48px -8px rgba(196,22,110,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(196,22,110,0.45) 0%, #180c10 60%); }
+.box-purple:hover  { box-shadow:0 0 48px -8px rgba(123,47,160,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(123,47,160,0.45) 0%, #180c10 60%); }
+.box-splat:hover   { box-shadow:0 0 48px -8px rgba(232,92,138,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(232,92,138,0.45) 0%, #180c10 60%); }
 
-  /* ── HERO ── */
-  #hero { padding:140px 0 90px; min-height:100vh; display:flex; align-items:center; border-top:none; }
-  .hero-inner { display:grid; grid-template-columns:1fr auto; gap:56px; align-items:center; }
+/* ── BTNS ── */
+.btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:12px 24px; border-radius:10px;
+  font-family:'DM Mono',monospace; font-size:13px;
+  text-decoration:none; transition:all 0.25s;
+  border:1.5px solid transparent; cursor:pointer;
+}
+.btn-red  { background:#c0152a; color:#fff; border-color:#c0152a; font-weight:600; }
+.btn-red:hover  { background:transparent; color:#c0152a; transform:translateY(-2px); box-shadow:0 8px 28px rgba(192,21,42,0.4); }
+.btn-out  { background:transparent; color:#f0e4e8; border-color:#5a2a38; }
+.btn-out:hover  { border-color:#e8197a; color:#e8197a; transform:translateY(-2px); }
 
-  .hero-tag {
-    display:inline-flex; align-items:center; gap:8px;
-    border:1.5px solid var(--border-bright); border-radius:100px;
-    padding:6px 16px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--muted); margin-bottom:28px; background:rgba(255,255,255,0.02);
-  }
-  .hero-tag .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse-dot 2.5s infinite; }
-  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.75)} }
+/* ── HERO ── */
+#hero { padding:140px 0 90px; min-height:100vh; display:flex; align-items:center; border-top:none; }
+.hero-inner { display:grid; grid-template-columns:1fr auto; gap:56px; align-items:center; }
 
-  .hero-name { font-family:'Instrument Serif',serif; font-size:clamp(50px,6.5vw,84px); line-height:1.0; letter-spacing:-0.03em; margin-bottom:10px; }
-  .hero-name .italic { font-style:italic; color:var(--accent); }
-  .hero-subtitle { font-family:'Syne',sans-serif; font-size:14px; font-weight:600; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:22px; }
-  .hero-bio { font-size:14px; color:#a0a0c0; max-width:540px; line-height:1.9; margin-bottom:36px; }
-  .hero-cta { display:flex; gap:12px; flex-wrap:wrap; }
+.hero-tag {
+  display:inline-flex; align-items:center; gap:8px;
+  border:1.5px solid #5a2a38; border-radius:100px;
+  padding:6px 16px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  color:#8a6470; margin-bottom:28px; background:rgba(255,255,255,0.01);
+}
+.dot-pulse { width:6px; height:6px; border-radius:50%; background:#c0152a; animation:pulse 2.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.75)} }
 
-  /* hero side card */
-  .hero-card {
-    --gc:rgba(167,139,250,0.35);
-    padding:28px; min-width:220px;
-    display:flex; flex-direction:column; gap:14px;
-  }
-  /* avatar: shows photo if loaded, falls back to gradient initial */
-  .hero-avatar {
-    width:110px; height:110px; border-radius:50%;
-    border:2.5px solid var(--accent2);
-    overflow:hidden; flex-shrink:0;
-    box-shadow:0 0 28px rgba(167,139,250,0.5);
-    background:linear-gradient(135deg,#a78bfa,#f472b6);
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Instrument Serif',serif; font-size:38px; color:#fff; font-style:italic;
-  }
-  .hero-avatar img {
-    width:100%; height:100%;
-    object-fit:cover; object-position:center top;
-    display:block;
-  }
-  /* hide the fallback letter once image loads */
-  .hero-avatar img + span { display:none; }
+.hero-name { font-family:'Instrument Serif',serif; font-size:clamp(50px,6.5vw,84px); line-height:1.0; letter-spacing:-0.03em; margin-bottom:10px; }
+.hero-name em { font-style:italic; color:#c0152a; }
+.hero-sub { font-family:'Syne',sans-serif; font-size:14px; font-weight:600; color:#8a6470; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:22px; }
+.hero-bio { font-size:14px; color:#c8a8b4; max-width:540px; line-height:1.9; margin-bottom:36px; }
+.hero-cta { display:flex; gap:12px; flex-wrap:wrap; }
 
-  .hero-card-name { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; }
-  .hero-card-role { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
-  .divider { height:1px; background:var(--border); }
-  .hero-stat { display:flex; justify-content:space-between; font-size:12px; }
-  .hero-stat-label { color:var(--muted); }
-  .hero-stat-val { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:var(--accent); }
-  .status-badge {
-    display:flex; align-items:center; gap:7px; font-size:11px; color:var(--muted);
-    padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:rgba(201,240,96,0.04);
-  }
-  .status-badge .dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:pulse-dot 2.5s infinite; }
+/* hero card */
+.hero-card { padding:28px; min-width:220px; display:flex; flex-direction:column; gap:14px; }
+.avatar {
+  width:110px; height:110px; border-radius:50%;
+  border:2.5px solid #e8197a;
+  overflow:hidden; flex-shrink:0;
+  box-shadow:0 0 30px rgba(232,25,122,0.5);
+  background:linear-gradient(135deg,#c0152a,#e8197a);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Instrument Serif',serif; font-size:38px; color:#fff; font-style:italic;
+}
+.avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
+.card-name { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; }
+.card-role { font-size:11px; color:#8a6470; text-transform:uppercase; letter-spacing:0.06em; }
+.hr { height:1px; background:#2e1820; }
+.stat { display:flex; justify-content:space-between; font-size:12px; }
+.stat-l { color:#8a6470; }
+.stat-v { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#b8b8cc; }
+.badge {
+  display:flex; align-items:center; gap:7px; font-size:11px; color:#8a6470;
+  padding:6px 10px; border:1px solid #2e1820; border-radius:8px; background:rgba(192,21,42,0.06);
+}
+.badge .dot-pulse { background:#c0152a; width:5px; height:5px; }
 
-  /* ── SECTIONS ── */
-  section { padding:100px 0; border-top:1.5px solid var(--border); }
-  .section-label { font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); font-family:'DM Mono',monospace; margin-bottom:10px; }
-  .section-title { font-family:'Instrument Serif',serif; font-size:clamp(32px,4vw,50px); line-height:1.1; letter-spacing:-0.02em; margin-bottom:48px; }
-  .section-title .italic { font-style:italic; color:var(--accent2); }
+/* ── SECTIONS ── */
+section { padding:100px 0; border-top:1.5px solid #2e1820; }
+.sec-label { font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:#c0152a; font-family:'DM Mono',monospace; margin-bottom:10px; }
+.sec-title { font-family:'Instrument Serif',serif; font-size:clamp(32px,4vw,50px); line-height:1.1; letter-spacing:-0.02em; margin-bottom:48px; }
+.sec-title em { font-style:italic; color:#e8197a; }
 
-  /* ── MARQUEE ── */
-  .marquee-bar { border-top:1.5px solid var(--border); border-bottom:1.5px solid var(--border); padding:14px 0; overflow:hidden; background:rgba(255,255,255,0.01); }
-  .marquee-track { display:flex; gap:36px; animation:marquee 24s linear infinite; white-space:nowrap; }
-  .marquee-item { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:14px; }
-  .marquee-item .sep { width:4px; height:4px; border-radius:50%; background:var(--accent); flex-shrink:0; }
-  @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+/* ── MARQUEE ── */
+.marquee-bar { border-top:1.5px solid #2e1820; border-bottom:1.5px solid #2e1820; padding:14px 0; overflow:hidden; background:rgba(255,255,255,0.01); }
+.marquee-track { display:flex; gap:36px; animation:marquee 26s linear infinite; white-space:nowrap; }
+.m-item { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#8a6470; display:flex; align-items:center; gap:14px; }
+.m-sep { width:4px; height:4px; border-radius:50%; background:#c0152a; flex-shrink:0; }
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
-  /* ── EDUCATION ── */
-  .edu-grid { display:flex; flex-direction:column; gap:12px; }
-  .bar { display:flex; align-items:center; gap:20px; padding:20px 26px; }
-  .bar-icon { width:44px; height:44px; border-radius:10px; border:1.5px solid var(--border-bright); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:rgba(255,255,255,0.03); }
-  .bar-body { flex:1; }
-  .bar-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; margin-bottom:2px; }
-  .bar-sub { font-size:12px; color:var(--muted); }
-  .bar-right { text-align:right; font-size:12px; color:var(--muted); flex-shrink:0; }
-  .bar-right .year { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--text); display:block; }
+/* ── EDUCATION BARS ── */
+.edu-grid { display:flex; flex-direction:column; gap:12px; }
+.bar { display:flex; align-items:center; gap:20px; padding:20px 26px; }
+.bar-ico { width:44px; height:44px; border-radius:10px; border:1.5px solid #5a2a38; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.bar-body { flex:1; }
+.bar-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; margin-bottom:2px; }
+.bar-sub { font-size:12px; color:#8a6470; }
+.bar-right { text-align:right; font-size:12px; color:#8a6470; flex-shrink:0; }
+.bar-right strong { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:#f0e4e8; display:block; }
 
-  /* ── EXPERIENCE ── */
-  .exp-grid { display:flex; flex-direction:column; gap:16px; }
-  .exp-box { padding:28px 32px; }
-  .exp-stripe { position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2; border-radius:3px 0 0 3px; background:linear-gradient(to bottom,var(--accent2),var(--accent3)); }
-  .exp-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:16px; flex-wrap:wrap; }
-  .exp-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:3px; }
-  .exp-org { font-size:13px; color:var(--accent2); }
-  .exp-date { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:6px; padding:4px 10px; white-space:nowrap; }
-  .exp-desc { font-size:13px; color:#8888aa; line-height:1.8; }
+/* ── EXPERIENCE ── */
+.exp-grid { display:flex; flex-direction:column; gap:16px; }
+.exp-box { padding:28px 32px; }
+.exp-stripe { position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:3px 0 0 3px; background:linear-gradient(to bottom,#e8197a,#7b2fa0); z-index:2; }
+.exp-hd { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:16px; flex-wrap:wrap; }
+.exp-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:3px; }
+.exp-org { font-size:13px; color:#e85c8a; }
+.exp-date { font-size:11px; color:#8a6470; border:1px solid #2e1820; border-radius:6px; padding:4px 10px; white-space:nowrap; }
+.exp-desc { font-size:13px; color:#a07888; line-height:1.8; }
 
-  /* ── SKILLS ── */
-  .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
-  .skill-box { padding:24px; }
-  .skill-box-title { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-  .skill-pills { display:flex; flex-wrap:wrap; gap:7px; }
-  .pill { font-size:12px; padding:5px 12px; border-radius:7px; border:1.5px solid var(--border); color:var(--text); background:rgba(255,255,255,0.02); transition:all 0.2s; cursor:default; }
-  .pill.c1 { border-color:rgba(201,240,96,0.4);  color:var(--accent);  background:rgba(201,240,96,0.07); }
-  .pill.c2 { border-color:rgba(167,139,250,0.4); color:var(--accent2); background:rgba(167,139,250,0.07); }
-  .pill.c3 { border-color:rgba(244,114,182,0.4); color:var(--accent3); background:rgba(244,114,182,0.07); }
-  .pill.c4 { border-color:rgba(103,232,249,0.4); color:var(--accent4); background:rgba(103,232,249,0.07); }
+/* ── SKILLS ── */
+.skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+.skill-box { padding:24px; }
+.skill-hd { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:#8a6470; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.pills { display:flex; flex-wrap:wrap; gap:7px; }
+.pill { font-size:12px; padding:5px 12px; border-radius:7px; border:1.5px solid; transition:transform 0.15s; cursor:default; }
+.pill:hover { transform:translateY(-1px); }
+/* pill per vinyl color */
+.p-red     { border-color:rgba(192,21,42,0.6);   color:#c0152a;  background:rgba(192,21,42,0.1); }
+.p-pink    { border-color:rgba(232,25,122,0.6);  color:#e8197a;  background:rgba(232,25,122,0.1); }
+.p-silver  { border-color:rgba(184,184,204,0.5); color:#b8b8cc;  background:rgba(184,184,204,0.08); }
+.p-clear   { border-color:rgba(210,228,240,0.4); color:#dde8f0;  background:rgba(210,228,240,0.06); }
+.p-magenta { border-color:rgba(196,22,110,0.6);  color:#c4166e;  background:rgba(196,22,110,0.1); }
+.p-purple  { border-color:rgba(123,47,160,0.6);  color:#9b5fd0;  background:rgba(123,47,160,0.1); }
+.p-splat   { border-color:rgba(232,92,138,0.6);  color:#e85c8a;  background:rgba(232,92,138,0.1); }
 
-  /* ── PROJECTS ── */
-  .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:20px; }
-  .project-card { padding:32px; display:flex; flex-direction:column; gap:16px; text-decoration:none; color:inherit; }
-  .project-topbar { position:absolute; top:0; left:0; right:0; height:2px; z-index:2; border-radius:14px 14px 0 0; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); opacity:0; transition:opacity 0.3s; }
-  .project-card:hover .project-topbar { opacity:1; }
-  .project-num { font-family:'Instrument Serif',serif; font-size:44px; font-style:italic; color:rgba(255,255,255,0.04); line-height:1; position:absolute; top:20px; right:24px; z-index:1; }
-  .project-tags { display:flex; gap:6px; flex-wrap:wrap; }
-  .project-tag { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:3px 9px; border-radius:5px; border:1px solid var(--border-bright); color:var(--muted); }
-  .project-title { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; line-height:1.3; color:var(--text); }
-  .project-desc { font-size:13px; color:var(--muted); line-height:1.85; flex:1; }
-  .findings { display:flex; flex-direction:column; gap:9px; margin-top:4px; }
-  .finding { display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--muted); line-height:1.6; }
-  .finding-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:6px; }
-  .project-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border); font-size:12px; margin-top:auto; }
-  .project-link { display:flex; align-items:center; gap:6px; color:var(--accent); font-weight:500; text-decoration:none; transition:gap 0.2s; }
-  .project-link:hover { gap:10px; }
-  .project-status { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:5px; padding:3px 9px; }
-  .project-status.done { color:#6ee7b7; border-color:rgba(110,231,183,0.4); background:rgba(110,231,183,0.06); }
-  .project-status.wip  { color:var(--accent2); border-color:rgba(167,139,250,0.4); background:rgba(167,139,250,0.06); }
-  .project-card.placeholder { border-style:dashed; opacity:0.5; }
+/* ── PROJECTS ── */
+.projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:20px; }
+.proj-card { padding:32px; display:flex; flex-direction:column; gap:16px; text-decoration:none; color:inherit; }
+.proj-topbar { position:absolute; top:0; left:0; right:0; height:2px; border-radius:14px 14px 0 0; background:linear-gradient(90deg,#c0152a,#e8197a,#7b2fa0); opacity:0; transition:opacity 0.3s; z-index:2; }
+.proj-card:hover .proj-topbar { opacity:1; }
+.proj-num { font-family:'Instrument Serif',serif; font-size:44px; font-style:italic; color:rgba(255,255,255,0.04); line-height:1; position:absolute; top:20px; right:24px; }
+.proj-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.proj-tag { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:3px 9px; border-radius:5px; border:1px solid #5a2a38; color:#8a6470; }
+.proj-title { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; line-height:1.3; }
+.proj-desc { font-size:13px; color:#8a6470; line-height:1.85; flex:1; }
+.findings { display:flex; flex-direction:column; gap:9px; margin-top:4px; }
+.finding { display:flex; align-items:flex-start; gap:10px; font-size:12px; color:#8a6470; line-height:1.6; }
+.fdot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:6px; }
+.proj-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid #2e1820; font-size:12px; margin-top:auto; }
+.proj-link { display:flex; align-items:center; gap:6px; color:#c0152a; font-weight:500; text-decoration:none; transition:gap 0.2s; }
+.proj-link:hover { gap:10px; }
+.badge-done { font-size:11px; color:#c8f0b0; border:1px solid rgba(180,230,150,0.35); border-radius:5px; padding:3px 9px; background:rgba(180,230,150,0.06); }
+.badge-wip  { font-size:11px; color:#e85c8a;  border:1px solid rgba(232,92,138,0.35);  border-radius:5px; padding:3px 9px; background:rgba(232,92,138,0.06); }
+.placeholder { border-style:dashed; opacity:0.5; }
 
-  /* ── CONTACT ── */
-  .contact-inner { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
-  .contact-links { display:flex; flex-direction:column; gap:12px; }
-  .contact-link { display:flex; align-items:center; gap:16px; padding:16px 20px; text-decoration:none; color:var(--text); transition:transform 0.25s; }
-  .contact-link:hover { transform:translateX(5px); }
-  .contact-link .ico { width:38px; height:38px; border-radius:9px; background:rgba(255,255,255,0.03); border:1.5px solid var(--border-bright); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-  .link-title { font-family:'Syne',sans-serif; font-weight:600; font-size:13px; margin-bottom:2px; }
-  .link-val { font-size:12px; color:var(--muted); }
-  .contact-right { --gc:rgba(201,240,96,0.28); padding:36px; }
-  .contact-right-title { font-family:'Instrument Serif',serif; font-size:28px; margin-bottom:12px; font-style:italic; }
-  .contact-right-text { font-size:13px; color:var(--muted); line-height:1.85; margin-bottom:24px; }
+/* ── CONTACT ── */
+.contact-inner { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+.contact-links { display:flex; flex-direction:column; gap:12px; }
+.c-link { display:flex; align-items:center; gap:16px; padding:16px 20px; text-decoration:none; color:#f0e4e8; transition:transform 0.25s; }
+.c-link:hover { transform:translateX(5px); }
+.c-ico { width:38px; height:38px; border-radius:9px; border:1.5px solid #5a2a38; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.c-title { font-family:'Syne',sans-serif; font-weight:600; font-size:13px; margin-bottom:2px; }
+.c-val { font-size:12px; color:#8a6470; }
+.c-right-title { font-family:'Instrument Serif',serif; font-size:28px; margin-bottom:12px; font-style:italic; }
+.c-right-text { font-size:13px; color:#8a6470; line-height:1.85; margin-bottom:24px; }
 
-  /* ── FOOTER ── */
-  footer { padding:32px 0; border-top:1.5px solid var(--border); }
-  footer .wrapper { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); }
-  footer .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color:var(--accent); }
+/* ── FOOTER ── */
+footer { padding:32px 0; border-top:1.5px solid #2e1820; }
+footer .wrapper { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8a6470; }
+.f-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color:#c0152a; }
 
-  /* ── FADE IN ── */
-  .fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.65s ease, transform 0.65s ease; }
-  .fade-up.visible { opacity:1; transform:translateY(0); }
+/* ── FADE IN ── */
+.fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.65s ease, transform 0.65s ease; }
+.fade-up.visible { opacity:1; transform:translateY(0); }
 
-  @media(max-width:768px){
-    .hero-inner{ grid-template-columns:1fr; }
-    .hero-card{ display:none; }
-    .contact-inner{ grid-template-columns:1fr; }
-    .nav-links{ display:none; }
-  }
+@media(max-width:768px){
+  .hero-inner { grid-template-columns:1fr; }
+  .hero-card  { display:none; }
+  .contact-inner { grid-template-columns:1fr; }
+  .nav-links { display:none; }
+}
 </style>
 </head>
 <body>
@@ -269,7 +229,7 @@
 <!-- NAV -->
 <nav>
   <div class="wrapper">
-    <a href="#hero" class="nav-logo">Lisa Here✦</a>
+    <a href="#hero" class="nav-logo">Lisa Here 🍀</a>
     <ul class="nav-links">
       <li><a href="#education">Education</a></li>
       <li><a href="#experience">Experience</a></li>
@@ -277,7 +237,7 @@
       <li><a href="#projects">Projects</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <a href="#contact" class="btn btn-primary" style="padding:8px 18px;font-size:12px;">Say Hello →</a>
+    <a href="#contact" class="btn btn-red" style="padding:8px 18px;font-size:12px;">Say Hello →</a>
   </div>
 </nav>
 
@@ -286,32 +246,33 @@
   <div class="wrapper">
     <div class="hero-inner">
       <div>
-        <div class="hero-tag fade-up"><span class="dot"></span>Open to opportunities</div>
-        <h1 class="hero-name fade-up">Jannat&#8209;E&#8209;Nur<br/><span class="italic">Lisa.</span></h1>
-        <p class="hero-subtitle fade-up">Data Analyst · CSE Graduate</p>
+        <div class="hero-tag fade-up"><span class="dot-pulse"></span>Open to opportunities</div>
+        <h1 class="hero-name fade-up">Jannat&#8209;E&#8209;Nur<br/><em>Lisa.</em></h1>
+        <p class="hero-sub fade-up">Data Analyst · CSE Graduate</p>
         <p class="hero-bio fade-up">Computer Science &amp; Engineering graduate passionate about data analytics in the business domain. I explore how data decodes customer decisions, surfaces hidden patterns, and shapes human-centered strategies — where numbers meet people.</p>
         <div class="hero-cta fade-up">
-          <a href="#projects" class="btn btn-primary">View Projects →</a>
-          <a href="#contact"  class="btn btn-outline">Get in Touch</a>
+          <a href="#projects" class="btn btn-red">View Projects →</a>
+          <a href="#contact" class="btn btn-out">Get in Touch</a>
         </div>
       </div>
 
-      <div class="hero-card glow-box fade-up">
-        <div class="hero-avatar">
+      <!-- hero card: hot pink vinyl -->
+      <div class="hero-card box box-pink fade-up">
+        <div class="avatar">
           <img src="assets/images/lisa .jpeg" alt="Lisa"
-               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-          <span style="display:none">L</span>
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
+          <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">L</span>
         </div>
         <div>
-          <div class="hero-card-name">Jannat-E-Nur</div>
-          <div class="hero-card-role">Data Analyst</div>
+          <div class="card-name">Jannat-E-Nur</div>
+          <div class="card-role">Data Analyst</div>
         </div>
-        <div class="divider"></div>
-        <div class="hero-stat"><span class="hero-stat-label">Degree</span><span class="hero-stat-val">B.Sc. CSE</span></div>
-        <div class="hero-stat"><span class="hero-stat-label">Graduated</span><span class="hero-stat-val">Feb 2026</span></div>
-        <div class="hero-stat"><span class="hero-stat-label">Focus</span><span class="hero-stat-val">Business Analytics</span></div>
-        <div class="divider"></div>
-        <div class="status-badge"><span class="dot"></span>Building portfolio projects</div>
+        <div class="hr"></div>
+        <div class="stat"><span class="stat-l">Degree</span><span class="stat-v">B.Sc. CSE</span></div>
+        <div class="stat"><span class="stat-l">Graduated</span><span class="stat-v">Feb 2026</span></div>
+        <div class="stat"><span class="stat-l">Focus</span><span class="stat-v">Business Analytics</span></div>
+        <div class="hr"></div>
+        <div class="badge"><span class="dot-pulse"></span>Building portfolio projects</div>
       </div>
     </div>
   </div>
@@ -320,61 +281,68 @@
 <!-- MARQUEE -->
 <div class="marquee-bar">
   <div class="marquee-track">
-    <span class="marquee-item">Python <span class="sep"></span></span>
-    <span class="marquee-item">SQL <span class="sep"></span></span>
-    <span class="marquee-item">Pandas <span class="sep"></span></span>
-    <span class="marquee-item">Seaborn <span class="sep"></span></span>
-    <span class="marquee-item">Behavioral Analytics <span class="sep"></span></span>
-    <span class="marquee-item">Data Storytelling <span class="sep"></span></span>
-    <span class="marquee-item">Google Sheets <span class="sep"></span></span>
-    <span class="marquee-item">NumPy <span class="sep"></span></span>
-    <span class="marquee-item">Consumer Psychology <span class="sep"></span></span>
-    <span class="marquee-item">Matplotlib <span class="sep"></span></span>
-    <span class="marquee-item">Business Intelligence <span class="sep"></span></span>
-    <span class="marquee-item">Python <span class="sep"></span></span>
-    <span class="marquee-item">SQL <span class="sep"></span></span>
-    <span class="marquee-item">Pandas <span class="sep"></span></span>
-    <span class="marquee-item">Seaborn <span class="sep"></span></span>
-    <span class="marquee-item">Behavioral Analytics <span class="sep"></span></span>
-    <span class="marquee-item">Data Storytelling <span class="sep"></span></span>
-    <span class="marquee-item">Google Sheets <span class="sep"></span></span>
-    <span class="marquee-item">NumPy <span class="sep"></span></span>
-    <span class="marquee-item">Consumer Psychology <span class="sep"></span></span>
-    <span class="marquee-item">Matplotlib <span class="sep"></span></span>
-    <span class="marquee-item">Business Intelligence <span class="sep"></span></span>
+    <span class="m-item">Python <span class="m-sep"></span></span>
+    <span class="m-item">SQL <span class="m-sep"></span></span>
+    <span class="m-item">Pandas <span class="m-sep"></span></span>
+    <span class="m-item">Seaborn <span class="m-sep"></span></span>
+    <span class="m-item">Behavioral Analytics <span class="m-sep"></span></span>
+    <span class="m-item">Data Storytelling <span class="m-sep"></span></span>
+    <span class="m-item">Google Sheets <span class="m-sep"></span></span>
+    <span class="m-item">NumPy <span class="m-sep"></span></span>
+    <span class="m-item">Consumer Psychology <span class="m-sep"></span></span>
+    <span class="m-item">Matplotlib <span class="m-sep"></span></span>
+    <span class="m-item">Business Intelligence <span class="m-sep"></span></span>
+    <span class="m-item">Python <span class="m-sep"></span></span>
+    <span class="m-item">SQL <span class="m-sep"></span></span>
+    <span class="m-item">Pandas <span class="m-sep"></span></span>
+    <span class="m-item">Seaborn <span class="m-sep"></span></span>
+    <span class="m-item">Behavioral Analytics <span class="m-sep"></span></span>
+    <span class="m-item">Data Storytelling <span class="m-sep"></span></span>
+    <span class="m-item">Google Sheets <span class="m-sep"></span></span>
+    <span class="m-item">NumPy <span class="m-sep"></span></span>
+    <span class="m-item">Consumer Psychology <span class="m-sep"></span></span>
+    <span class="m-item">Matplotlib <span class="m-sep"></span></span>
+    <span class="m-item">Business Intelligence <span class="m-sep"></span></span>
   </div>
 </div>
 
 <!-- EDUCATION -->
 <section id="education">
   <div class="wrapper">
-    <p class="section-label fade-up">// 01 — Education</p>
-    <h2 class="section-title fade-up">Where it all <span class="italic">began.</span></h2>
+    <p class="sec-label fade-up">// 01 — Education</p>
+    <h2 class="sec-title fade-up">Where it all <em>began.</em></h2>
     <div class="edu-grid">
-      <div class="bar glow-box fade-up" style="--gc:rgba(167,139,250,0.35)">
-        <div class="bar-icon">🎓</div>
+
+      <!-- silver vinyl -->
+      <div class="bar box box-silver fade-up">
+        <div class="bar-ico">🎓</div>
         <div class="bar-body">
           <div class="bar-title">B.Sc. in Computer Science &amp; Engineering</div>
           <div class="bar-sub">European University of Bangladesh · Dhaka, Bangladesh</div>
         </div>
-        <div class="bar-right"><span class="year">Feb 2026</span><span>CSE</span></div>
+        <div class="bar-right"><strong>Feb 2026</strong><span>CSE</span></div>
       </div>
-      <div class="bar glow-box fade-up" style="--gc:rgba(103,232,249,0.30)">
-        <div class="bar-icon">📚</div>
+
+      <!-- clear vinyl -->
+      <div class="bar box box-clear fade-up">
+        <div class="bar-ico">📚</div>
         <div class="bar-body">
           <div class="bar-title">Higher Secondary Certificate (HSC)</div>
           <div class="bar-sub">Dhamrai Hardinge High School &amp; College · Dhaka, Bangladesh</div>
         </div>
-        <div class="bar-right"><span class="year">Science</span></div>
+        <div class="bar-right"><strong>Science</strong></div>
       </div>
-      <div class="bar glow-box fade-up" style="--gc:rgba(244,114,182,0.30)">
-        <div class="bar-icon">🏫</div>
+
+      <!-- magenta vinyl -->
+      <div class="bar box box-magenta fade-up">
+        <div class="bar-ico">🏫</div>
         <div class="bar-body">
           <div class="bar-title">Secondary School Certificate (SSC)</div>
           <div class="bar-sub">Jyoti Vidya Niketon · Dhaka, Bangladesh</div>
         </div>
-        <div class="bar-right"><span class="year">Science</span></div>
+        <div class="bar-right"><strong>Science</strong></div>
       </div>
+
     </div>
   </div>
 </section>
@@ -382,59 +350,112 @@
 <!-- EXPERIENCE -->
 <section id="experience">
   <div class="wrapper">
-    <p class="section-label fade-up">// 02 — Experience</p>
-    <h2 class="section-title fade-up">Real-world <span class="italic">work.</span></h2>
+    <p class="sec-label fade-up">// 02 — Experience</p>
+    <h2 class="sec-title fade-up">Real-world <em>work.</em></h2>
     <div class="exp-grid">
-      <div class="exp-box glow-box fade-up" style="--gc:rgba(167,139,250,0.30)">
+
+      <!-- hot pink vinyl -->
+      <div class="exp-box box box-pink fade-up">
         <div class="exp-stripe"></div>
-        <div class="exp-header">
-          <div><div class="exp-title">Planning &amp; Development Intern</div><div class="exp-org">European University of Bangladesh</div></div>
+        <div class="exp-hd">
+          <div>
+            <div class="exp-title">Planning &amp; Development Intern</div>
+            <div class="exp-org">European University of Bangladesh</div>
+          </div>
           <div class="exp-date">Mar 2025 – Aug 2025</div>
         </div>
-        <p class="exp-desc">Supported strategic planning initiatives across departments. Collected, compiled, and organized institutional data to assist decision-making. Conducted usability testing of the university website and coordinated with faculty, staff, and external vendors to streamline workflows.</p>
+        <p class="exp-desc">Supported strategic planning initiatives across departments. Collected, compiled, and organized institutional data to assist decision-making. Conducted usability testing of the university website and coordinated with faculty, staff, and external vendors.</p>
       </div>
-      <div class="exp-box glow-box fade-up" style="--gc:rgba(103,232,249,0.26)">
+
+      <!-- splatter vinyl -->
+      <div class="exp-box box box-splat fade-up">
         <div class="exp-stripe"></div>
-        <div class="exp-header">
-          <div><div class="exp-title">Campus Ambassador &amp; Volunteer</div><div class="exp-org">UNDP Future Nation Project</div></div>
+        <div class="exp-hd">
+          <div>
+            <div class="exp-title">Campus Ambassador &amp; Volunteer</div>
+            <div class="exp-org">UNDP Future Nation Project</div>
+          </div>
           <div class="exp-date">Volunteer</div>
         </div>
         <p class="exp-desc">Represented UNDP on campus, promoted sustainability and development initiatives, engaged students in awareness campaigns, and built networks between UNDP and the university community.</p>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- SKILLS -->
+<!-- SKILLS — each box = one vinyl -->
 <section id="skills">
   <div class="wrapper">
-    <p class="section-label fade-up">// 03 — Skills</p>
-    <h2 class="section-title fade-up">Tools of the <span class="italic">trade.</span></h2>
+    <p class="sec-label fade-up">// 03 — Skills</p>
+    <h2 class="sec-title fade-up">Tools of the <em>trade.</em></h2>
     <div class="skills-grid">
-      <div class="skill-box glow-box fade-up" style="--gc:rgba(201,240,96,0.30)">
-        <div class="skill-box-title"><span>🐍</span> Languages</div>
-        <div class="skill-pills"><span class="pill c1">Python</span><span class="pill c1">SQL</span></div>
+
+      <!-- 🔴 blood red vinyl -->
+      <div class="skill-box box box-red fade-up">
+        <div class="skill-hd"><span>🐍</span> Languages</div>
+        <div class="pills">
+          <span class="pill p-red">Python</span>
+          <span class="pill p-red">SQL</span>
+        </div>
       </div>
-      <div class="skill-box glow-box fade-up" style="--gc:rgba(167,139,250,0.32)">
-        <div class="skill-box-title"><span>📦</span> Python Libraries</div>
-        <div class="skill-pills"><span class="pill c2">Pandas</span><span class="pill c2">NumPy</span><span class="pill c2">Matplotlib</span><span class="pill c2">Seaborn</span></div>
+
+      <!-- 🩷 hot pink vinyl -->
+      <div class="skill-box box box-pink fade-up">
+        <div class="skill-hd"><span>📦</span> Python Libraries</div>
+        <div class="pills">
+          <span class="pill p-pink">Pandas</span>
+          <span class="pill p-pink">NumPy</span>
+          <span class="pill p-pink">Matplotlib</span>
+          <span class="pill p-pink">Seaborn</span>
+        </div>
       </div>
-      <div class="skill-box glow-box fade-up" style="--gc:rgba(103,232,249,0.28)">
-        <div class="skill-box-title"><span>📊</span> Data &amp; Analytics</div>
-        <div class="skill-pills"><span class="pill c4">Data Cleaning</span><span class="pill c4">Data Analysis</span><span class="pill c4">Data Visualization</span><span class="pill c4">Excel / Google Sheets</span></div>
+
+      <!-- ⚪ silver vinyl -->
+      <div class="skill-box box box-silver fade-up">
+        <div class="skill-hd"><span>📊</span> Data &amp; Analytics</div>
+        <div class="pills">
+          <span class="pill p-silver">Data Cleaning</span>
+          <span class="pill p-silver">Data Analysis</span>
+          <span class="pill p-silver">Data Visualization</span>
+          <span class="pill p-silver">Excel / Google Sheets</span>
+        </div>
       </div>
-      <div class="skill-box glow-box fade-up" style="--gc:rgba(244,114,182,0.30)">
-        <div class="skill-box-title"><span>💼</span> Professional</div>
-        <div class="skill-pills"><span class="pill c3">Project Coordination</span><span class="pill c3">Critical Thinking</span><span class="pill c3">Report Writing</span><span class="pill c3">Communication</span></div>
+
+      <!-- 🟣 purple vinyl -->
+      <div class="skill-box box box-purple fade-up">
+        <div class="skill-hd"><span>💼</span> Professional</div>
+        <div class="pills">
+          <span class="pill p-purple">Project Coordination</span>
+          <span class="pill p-purple">Critical Thinking</span>
+          <span class="pill p-purple">Report Writing</span>
+          <span class="pill p-purple">Communication</span>
+        </div>
       </div>
-      <div class="skill-box glow-box fade-up" style="--gc:rgba(167,139,250,0.28)">
-        <div class="skill-box-title"><span>🛠️</span> Tools &amp; Environment</div>
-        <div class="skill-pills"><span class="pill">VS Code</span><span class="pill">GitHub</span><span class="pill">SQLite</span><span class="pill">Google Sheets</span><span class="pill">Jupyter Notebooks</span></div>
+
+      <!-- 🫧 clear vinyl -->
+      <div class="skill-box box box-clear fade-up">
+        <div class="skill-hd"><span>🛠️</span> Tools &amp; Environment</div>
+        <div class="pills">
+          <span class="pill p-clear">VS Code</span>
+          <span class="pill p-clear">GitHub</span>
+          <span class="pill p-clear">SQLite</span>
+          <span class="pill p-clear">Google Sheets</span>
+          <span class="pill p-clear">Jupyter Notebooks</span>
+        </div>
       </div>
-      <div class="skill-box glow-box fade-up" style="--gc:rgba(201,240,96,0.26)">
-        <div class="skill-box-title"><span>🔍</span> Domain Interest</div>
-        <div class="skill-pills"><span class="pill c1">Business Analytics</span><span class="pill c1">Consumer Psychology</span><span class="pill c1">Human Behavior</span><span class="pill c1">Behavioral Data</span></div>
+
+      <!-- 🌸 splatter vinyl -->
+      <div class="skill-box box box-splat fade-up">
+        <div class="skill-hd"><span>🔍</span> Domain Interest</div>
+        <div class="pills">
+          <span class="pill p-splat">Business Analytics</span>
+          <span class="pill p-splat">Consumer Psychology</span>
+          <span class="pill p-splat">Human Behavior</span>
+          <span class="pill p-splat">Behavioral Data</span>
+        </div>
       </div>
+
     </div>
   </div>
 </section>
@@ -442,42 +463,44 @@
 <!-- PROJECTS -->
 <section id="projects">
   <div class="wrapper">
-    <p class="section-label fade-up">// 04 — Projects</p>
-    <h2 class="section-title fade-up">Things I've <span class="italic">built.</span></h2>
+    <p class="sec-label fade-up">// 04 — Projects</p>
+    <h2 class="sec-title fade-up">Things I've <em>built.</em></h2>
     <div class="projects-grid">
 
+      <!-- 🔴 blood red vinyl -->
       <a href="https://github.com/jannatenurlisa/Ecommerce-Churn-Analysis" target="_blank"
-         class="project-card glow-box fade-up" style="--gc:rgba(201,240,96,0.26)">
-        <div class="project-topbar"></div>
-        <span class="project-num">01</span>
-        <div class="project-tags">
-          <span class="project-tag">Python</span>
-          <span class="project-tag">Pandas</span>
-          <span class="project-tag">Seaborn</span>
-          <span class="project-tag">Behavioral Segmentation</span>
+         class="proj-card box box-red fade-up">
+        <div class="proj-topbar"></div>
+        <span class="proj-num">01</span>
+        <div class="proj-tags">
+          <span class="proj-tag">Python</span>
+          <span class="proj-tag">Pandas</span>
+          <span class="proj-tag">Seaborn</span>
+          <span class="proj-tag">Behavioral Segmentation</span>
         </div>
-        <div class="project-title">E-Commerce Churn Analysis</div>
-        <p class="project-desc">Analyzed 7 months of clickstream data (74,817 events · 1,000 users) to identify at-risk users <em>before</em> they fully churn — surfacing signals that spend-based monitoring misses entirely.</p>
+        <div class="proj-title">E-Commerce Churn Analysis</div>
+        <p class="proj-desc">Analyzed 7 months of clickstream data (74,817 events · 1,000 users) to identify at-risk users <em>before</em> they fully churn — surfacing signals that spend-based monitoring misses entirely.</p>
         <div class="findings">
-          <div class="finding"><div class="finding-dot" style="background:var(--accent)"></div><span>At-risk users spend only $11 less than active users — invisible to spend monitoring alone</span></div>
-          <div class="finding"><div class="finding-dot" style="background:var(--accent2)"></div><span>186 "Quiet Loyal" users purchase above median frequency despite low activity; 2 are top-10 spenders</span></div>
-          <div class="finding"><div class="finding-dot" style="background:var(--accent3)"></div><span>Intervention window is only 15 days — 7-day inactivity flagging is the only reliable early signal</span></div>
+          <div class="finding"><div class="fdot" style="background:#c0152a"></div><span>At-risk users spend only $11 less than active users — invisible to spend monitoring alone</span></div>
+          <div class="finding"><div class="fdot" style="background:#e8197a"></div><span>186 "Quiet Loyal" users purchase above median frequency; 2 are top-10 spenders</span></div>
+          <div class="finding"><div class="fdot" style="background:#9b5fd0"></div><span>Intervention window is only 15 days — 7-day inactivity flagging is the only reliable early signal</span></div>
         </div>
-        <div class="project-footer">
-          <span class="project-link">View on GitHub →</span>
-          <span class="project-status done">Completed</span>
+        <div class="proj-footer">
+          <span class="proj-link">View on GitHub →</span>
+          <span class="badge-done">Completed</span>
         </div>
       </a>
 
-      <div class="project-card glow-box placeholder fade-up" style="--gc:rgba(167,139,250,0.22)">
-        <div class="project-topbar"></div>
-        <span class="project-num">02</span>
-        <div class="project-tags"><span class="project-tag">SQL</span><span class="project-tag">Coming Soon</span></div>
-        <div class="project-title">SQL Project</div>
-        <p class="project-desc">An upcoming SQL-focused data analysis project is currently in progress. Check back soon.</p>
-        <div class="project-footer">
-          <span style="color:var(--muted);font-size:12px;">— In progress —</span>
-          <span class="project-status wip">Coming Soon</span>
+      <!-- 💗 magenta vinyl -->
+      <div class="proj-card box box-magenta placeholder fade-up">
+        <div class="proj-topbar"></div>
+        <span class="proj-num">02</span>
+        <div class="proj-tags"><span class="proj-tag">SQL</span><span class="proj-tag">Coming Soon</span></div>
+        <div class="proj-title">SQL Project</div>
+        <p class="proj-desc">An upcoming SQL-focused data analysis project is currently in progress. Check back soon.</p>
+        <div class="proj-footer">
+          <span style="color:#8a6470;font-size:12px;">— In progress —</span>
+          <span class="badge-wip">Coming Soon</span>
         </div>
       </div>
 
@@ -488,25 +511,38 @@
 <!-- CONTACT -->
 <section id="contact">
   <div class="wrapper">
-    <p class="section-label fade-up">// 05 — Contact</p>
-    <h2 class="section-title fade-up">Let's <span class="italic">connect.</span></h2>
+    <p class="sec-label fade-up">// 05 — Contact</p>
+    <h2 class="sec-title fade-up">Let's <em>connect.</em></h2>
     <div class="contact-inner">
       <div class="contact-links fade-up">
-        <a href="mailto:jannatenurlisa@gmail.com" class="contact-link glow-box" style="--gc:rgba(201,240,96,0.26)">
-          <div class="ico">✉️</div><div><div class="link-title">Email</div><div class="link-val">jannatenurlisa@gmail.com</div></div>
+
+        <!-- 🔴 red vinyl -->
+        <a href="mailto:jannatenurlisa@gmail.com" class="c-link box box-red">
+          <div class="c-ico">✉️</div>
+          <div><div class="c-title">Email</div><div class="c-val">jannatenurlisa@gmail.com</div></div>
         </a>
-        <a href="https://github.com/jannatenurlisa" target="_blank" class="contact-link glow-box" style="--gc:rgba(103,232,249,0.26)">
-          <div class="ico">🐙</div><div><div class="link-title">GitHub</div><div class="link-val">github.com/jannatenurlisa</div></div>
+
+        <!-- ⚪ silver vinyl -->
+        <a href="https://github.com/jannatenurlisa" target="_blank" class="c-link box box-silver">
+          <div class="c-ico">🐙</div>
+          <div><div class="c-title">GitHub</div><div class="c-val">github.com/jannatenurlisa</div></div>
         </a>
-        <a href="https://www.linkedin.com/in/jannatenurlisa/" target="_blank" class="contact-link glow-box" style="--gc:rgba(167,139,250,0.28)">
-          <div class="ico">💼</div><div><div class="link-title">LinkedIn</div><div class="link-val">linkedin.com/in/jannatenurlisa</div></div>
+
+        <!-- 🩷 pink vinyl -->
+        <a href="https://www.linkedin.com/in/jannatenurlisa/" target="_blank" class="c-link box box-pink">
+          <div class="c-ico">💼</div>
+          <div><div class="c-title">LinkedIn</div><div class="c-val">linkedin.com/in/jannatenurlisa</div></div>
         </a>
+
       </div>
-      <div class="contact-right glow-box fade-up">
-        <div class="contact-right-title">Open to work &amp; collaboration.</div>
-        <p class="contact-right-text">I'm actively looking for data analyst roles and freelance opportunities. I'm especially drawn to projects at the intersection of data and human behavior — consumer research, behavioral analytics, and business intelligence.<br/><br/>Feel free to reach out if you'd like to collaborate, chat about data, or explore what we could build together.</p>
-        <a href="mailto:jannatenurlisa@gmail.com" class="btn btn-primary">Send a Message →</a>
+
+      <!-- 🟣 purple vinyl -->
+      <div class="box box-purple fade-up" style="padding:36px;">
+        <div class="c-right-title">Open to work &amp; collaboration.</div>
+        <p class="c-right-text">I'm actively looking for data analyst roles and freelance opportunities. I'm especially drawn to projects at the intersection of data and human behavior — consumer research, behavioral analytics, and business intelligence.<br/><br/>Feel free to reach out if you'd like to collaborate, chat about data, or explore what we could build together.</p>
+        <a href="mailto:jannatenurlisa@gmail.com" class="btn btn-red">Send a Message →</a>
       </div>
+
     </div>
   </div>
 </section>
@@ -514,30 +550,38 @@
 <!-- FOOTER -->
 <footer>
   <div class="wrapper">
-    <span class="logo">Lisa ☁</span>
+    <span class="f-logo">Lisa ☁️</span>
     <span>© 2026 Jannat-E-Nur · Built with intention.</span>
-    <span style="color:var(--accent)">Everything goes🌿</span>
+    <span style="color:#c0152a">Everything Goes 🌿</span>
   </div>
 </footer>
 
 <script>
-// ── SPARKLE ──
+// ── SPARKLE — all 7 vinyl colors ──
 const canvas = document.getElementById('sparkle-canvas');
-const ctx = canvas.getContext('2d');
-let W, H, particles = [];
+const ctx    = canvas.getContext('2d');
+let W, H, P  = [];
+const COLS   = [
+  'rgba(192,21,42,',   // blood red
+  'rgba(232,25,122,',  // hot pink
+  'rgba(184,184,204,', // silver
+  'rgba(210,228,240,', // clear
+  'rgba(196,22,110,',  // magenta
+  'rgba(123,47,160,',  // purple
+  'rgba(232,92,138,'   // splatter
+];
 function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-const COLS = ['rgba(201,240,96,','rgba(167,139,250,','rgba(244,114,182,','rgba(103,232,249,','rgba(255,255,255,'];
-function mkP(){ return { x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+0.2, alpha:Math.random()*0.6+0.1, speed:Math.random()*0.25+0.04, drift:(Math.random()-0.5)*0.15, tw:Math.random()*0.018+0.004, col:COLS[Math.floor(Math.random()*COLS.length)] }; }
-function init(){ particles = Array.from({length:120}, mkP); }
+function mkP(){ return { x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.4+0.3, a:Math.random()*0.55+0.1, s:Math.random()*0.24+0.04, d:(Math.random()-0.5)*0.14, tw:Math.random()*0.016+0.004, c:COLS[Math.floor(Math.random()*COLS.length)] }; }
+function init(){ P = Array.from({length:130}, mkP); }
 function draw(){
   ctx.clearRect(0,0,W,H);
-  particles.forEach(p=>{
+  P.forEach(p=>{
     ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle = p.col+p.alpha+')'; ctx.fill();
-    p.y -= p.speed; p.x += p.drift;
-    p.alpha += (Math.random()-0.5)*p.tw;
-    p.alpha = Math.max(0.05, Math.min(0.8, p.alpha));
-    if(p.y < -4){ p.y = H+4; p.x = Math.random()*W; }
+    ctx.fillStyle = p.c+p.a+')'; ctx.fill();
+    p.y-=p.s; p.x+=p.d;
+    p.a+=(Math.random()-0.5)*p.tw;
+    p.a=Math.max(0.05,Math.min(0.72,p.a));
+    if(p.y<-4){ p.y=H+4; p.x=Math.random()*W; }
   });
   requestAnimationFrame(draw);
 }
@@ -545,27 +589,30 @@ resize(); init(); draw();
 addEventListener('resize', resize);
 
 // ── SCROLL FADE ──
-const obs = new IntersectionObserver(es => es.forEach(e => {
+const obs = new IntersectionObserver(es => es.forEach(e=>{
   if(e.isIntersecting) e.target.classList.add('visible');
 }), {threshold:0.08});
-document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
 
-// ── GLOW BOX: tilt + cursor-tracked glow origin ──
-document.querySelectorAll('.glow-box').forEach(box => {
-  box.addEventListener('mousemove', e => {
+// ── TILT + cursor-tracked glow ──
+document.querySelectorAll('.box').forEach(box=>{
+  box.addEventListener('mousemove', e=>{
     const r  = box.getBoundingClientRect();
-    const dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
-    const dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
+    const dx = (e.clientX-(r.left+r.width/2))  / (r.width/2);
+    const dy = (e.clientY-(r.top+r.height/2))  / (r.height/2);
     box.style.transform = `perspective(700px) rotateX(${-dy*6}deg) rotateY(${dx*6}deg) translate(${dx*5}px,${dy*5}px)`;
-    box.style.setProperty('--gx', ((e.clientX - r.left) / r.width  * 100).toFixed(1)+'%');
-    box.style.setProperty('--gy', ((e.clientY - r.top)  / r.height * 100).toFixed(1)+'%');
+    box.style.setProperty('--gx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+    box.style.setProperty('--gy', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
   });
-  box.addEventListener('mouseleave', () => {
-    box.style.transform = '';
+  box.addEventListener('mouseleave',()=>{
+    box.style.transform='';
     box.style.removeProperty('--gx');
     box.style.removeProperty('--gy');
   });
 });
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
