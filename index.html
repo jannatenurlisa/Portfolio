@@ -1,624 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Jannat-E-Nur Lisa </title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-<style>
-* { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; }
-
-body {
-  background:#0d0608;
-  color:#f0e4e8;
-  font-family:'DM Mono',monospace;
-  font-size:14px;
-  line-height:1.7;
-  overflow-x:hidden;
-}
-
-/* sparkle canvas */
-#sparkle-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; }
-
-.wrapper { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:0 28px; }
-
-/* ── NAV ── */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:100;
-  border-bottom:1.5px solid #2e1820;
-  background:rgba(13,6,8,0.92);
-  backdrop-filter:blur(14px);
-}
-nav .wrapper { display:flex; align-items:center; justify-content:space-between; height:58px; }
-.nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:#c0152a; text-decoration:none; }
-.nav-links { display:flex; gap:2px; list-style:none; }
-.nav-links a {
-  color:#8a6470; text-decoration:none; font-size:11px;
-  letter-spacing:0.08em; text-transform:uppercase;
-  padding:7px 14px; border:1.5px solid transparent; border-radius:8px; transition:all 0.2s;
-}
-.nav-links a:hover { color:#f0e4e8; border-color:#5a2a38; }
-
-/* ── GLOW BOXES ── each gets a unique class with its vinyl color baked in */
-.box {
-  position:relative;
-  border:1.5px solid #2e1820;
-  border-radius:14px;
-  overflow:hidden;
-  transition:transform 0.12s ease-out, border-color 0.3s, box-shadow 0.3s;
-  will-change:transform;
-}
-.box:hover { border-color:#5a2a38; }
-
-/* each vinyl color variant — background glow always visible */
-.box-red     { background:radial-gradient(ellipse at 50% 30%, rgba(192,21,42,0.28) 0%, #180c10 65%); }
-.box-pink    { background:radial-gradient(ellipse at 50% 30%, rgba(232,25,122,0.28) 0%, #180c10 65%); }
-.box-silver  { background:radial-gradient(ellipse at 50% 30%, rgba(184,184,204,0.22) 0%, #180c10 65%); }
-.box-clear   { background:radial-gradient(ellipse at 50% 30%, rgba(210,228,240,0.18) 0%, #180c10 65%); }
-.box-magenta { background:radial-gradient(ellipse at 50% 30%, rgba(196,22,110,0.28) 0%, #180c10 65%); }
-.box-purple  { background:radial-gradient(ellipse at 50% 30%, rgba(123,47,160,0.28) 0%, #180c10 65%); }
-.box-splat   { background:radial-gradient(ellipse at 50% 30%, rgba(232,92,138,0.28) 0%, #180c10 65%); }
-
-/* hover intensifies the glow and adds outer shadow */
-.box-red:hover     { box-shadow:0 0 48px -8px rgba(192,21,42,0.6),  0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(192,21,42,0.45) 0%, #180c10 60%); }
-.box-pink:hover    { box-shadow:0 0 48px -8px rgba(232,25,122,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(232,25,122,0.45) 0%, #180c10 60%); }
-.box-silver:hover  { box-shadow:0 0 48px -8px rgba(184,184,204,0.5),0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(184,184,204,0.38) 0%, #180c10 60%); }
-.box-clear:hover   { box-shadow:0 0 48px -8px rgba(210,228,240,0.45),0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(210,228,240,0.32) 0%, #180c10 60%); }
-.box-magenta:hover { box-shadow:0 0 48px -8px rgba(196,22,110,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(196,22,110,0.45) 0%, #180c10 60%); }
-.box-purple:hover  { box-shadow:0 0 48px -8px rgba(123,47,160,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(123,47,160,0.45) 0%, #180c10 60%); }
-.box-splat:hover   { box-shadow:0 0 48px -8px rgba(232,92,138,0.6), 0 8px 32px rgba(0,0,0,0.6); background:radial-gradient(ellipse at var(--gx,50%) var(--gy,30%), rgba(232,92,138,0.45) 0%, #180c10 60%); }
-
-/* ── BTNS ── */
-.btn {
-  display:inline-flex; align-items:center; gap:8px;
-  padding:12px 24px; border-radius:10px;
-  font-family:'DM Mono',monospace; font-size:13px;
-  text-decoration:none; transition:all 0.25s;
-  border:1.5px solid transparent; cursor:pointer;
-}
-.btn-red  { background:#c0152a; color:#fff; border-color:#c0152a; font-weight:600; }
-.btn-red:hover  { background:transparent; color:#c0152a; transform:translateY(-2px); box-shadow:0 8px 28px rgba(192,21,42,0.4); }
-.btn-out  { background:transparent; color:#f0e4e8; border-color:#5a2a38; }
-.btn-out:hover  { border-color:#e8197a; color:#e8197a; transform:translateY(-2px); }
-
-/* ── HERO ── */
-#hero { padding:140px 0 90px; min-height:100vh; display:flex; align-items:center; border-top:none; }
-.hero-inner { display:grid; grid-template-columns:1fr auto; gap:56px; align-items:center; }
-
-.hero-tag {
-  display:inline-flex; align-items:center; gap:8px;
-  border:1.5px solid #5a2a38; border-radius:100px;
-  padding:6px 16px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
-  color:#8a6470; margin-bottom:28px; background:rgba(255,255,255,0.01);
-}
-.dot-pulse { width:6px; height:6px; border-radius:50%; background:#c0152a; animation:pulse 2.5s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.75)} }
-
-.hero-name { font-family:'Instrument Serif',serif; font-size:clamp(50px,6.5vw,84px); line-height:1.0; letter-spacing:-0.03em; margin-bottom:10px; }
-.hero-name em { font-style:italic; color:#c0152a; }
-.hero-sub { font-family:'Syne',sans-serif; font-size:14px; font-weight:600; color:#8a6470; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:22px; }
-.hero-bio { font-size:14px; color:#c8a8b4; max-width:540px; line-height:1.9; margin-bottom:36px; }
-.hero-cta { display:flex; gap:12px; flex-wrap:wrap; }
-
-/* hero card */
-.hero-card { padding:28px; min-width:220px; display:flex; flex-direction:column; gap:14px; }
-.avatar {
-  width:110px; height:110px; border-radius:50%;
-  border:2.5px solid #e8197a;
-  overflow:hidden; flex-shrink:0;
-  box-shadow:0 0 30px rgba(232,25,122,0.5);
-  background:linear-gradient(135deg,#c0152a,#e8197a);
-  display:flex; align-items:center; justify-content:center;
-  font-family:'Instrument Serif',serif; font-size:38px; color:#fff; font-style:italic;
-}
-.avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
-.card-name { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; }
-.card-role { font-size:11px; color:#8a6470; text-transform:uppercase; letter-spacing:0.06em; }
-.hr { height:1px; background:#2e1820; }
-.stat { display:flex; justify-content:space-between; font-size:12px; }
-.stat-l { color:#8a6470; }
-.stat-v { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#b8b8cc; }
-.badge {
-  display:flex; align-items:center; gap:7px; font-size:11px; color:#8a6470;
-  padding:6px 10px; border:1px solid #2e1820; border-radius:8px; background:rgba(192,21,42,0.06);
-}
-.badge .dot-pulse { background:#c0152a; width:5px; height:5px; }
-
-/* ── SECTIONS ── */
-section { padding:100px 0; border-top:1.5px solid #2e1820; }
-.sec-label { font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:#c0152a; font-family:'DM Mono',monospace; margin-bottom:10px; }
-.sec-title { font-family:'Instrument Serif',serif; font-size:clamp(32px,4vw,50px); line-height:1.1; letter-spacing:-0.02em; margin-bottom:48px; }
-.sec-title em { font-style:italic; color:#e8197a; }
-
-/* ── MARQUEE ── */
-.marquee-bar { border-top:1.5px solid #2e1820; border-bottom:1.5px solid #2e1820; padding:14px 0; overflow:hidden; background:rgba(255,255,255,0.01); }
-.marquee-track { display:flex; gap:36px; animation:marquee 26s linear infinite; white-space:nowrap; }
-.m-item { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#8a6470; display:flex; align-items:center; gap:14px; }
-.m-sep { width:4px; height:4px; border-radius:50%; background:#c0152a; flex-shrink:0; }
-@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-/* ── EDUCATION BARS ── */
-.edu-grid { display:flex; flex-direction:column; gap:12px; }
-.bar { display:flex; align-items:center; gap:20px; padding:20px 26px; }
-.bar-ico { width:44px; height:44px; border-radius:10px; border:1.5px solid #5a2a38; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-.bar-body { flex:1; }
-.bar-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; margin-bottom:2px; }
-.bar-sub { font-size:12px; color:#8a6470; }
-.bar-right { text-align:right; font-size:12px; color:#8a6470; flex-shrink:0; }
-.bar-right strong { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:#f0e4e8; display:block; }
-
-/* ── EXPERIENCE ── */
-.exp-grid { display:flex; flex-direction:column; gap:16px; }
-.exp-box { padding:28px 32px; }
-.exp-stripe { position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:3px 0 0 3px; background:linear-gradient(to bottom,#e8197a,#7b2fa0); z-index:2; }
-.exp-hd { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:16px; flex-wrap:wrap; }
-.exp-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:3px; }
-.exp-org { font-size:13px; color:#e85c8a; }
-.exp-date { font-size:11px; color:#8a6470; border:1px solid #2e1820; border-radius:6px; padding:4px 10px; white-space:nowrap; }
-.exp-desc { font-size:13px; color:#a07888; line-height:1.8; }
-
-/* ── SKILLS ── */
-.skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
-.skill-box { padding:24px; }
-.skill-hd { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:#8a6470; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-.pills { display:flex; flex-wrap:wrap; gap:7px; }
-.pill { font-size:12px; padding:5px 12px; border-radius:7px; border:1.5px solid; transition:transform 0.15s; cursor:default; }
-.pill:hover { transform:translateY(-1px); }
-/* pill per vinyl color */
-.p-red     { border-color:rgba(192,21,42,0.6);   color:#c0152a;  background:rgba(192,21,42,0.1); }
-.p-pink    { border-color:rgba(232,25,122,0.6);  color:#e8197a;  background:rgba(232,25,122,0.1); }
-.p-silver  { border-color:rgba(184,184,204,0.5); color:#b8b8cc;  background:rgba(184,184,204,0.08); }
-.p-clear   { border-color:rgba(210,228,240,0.4); color:#dde8f0;  background:rgba(210,228,240,0.06); }
-.p-magenta { border-color:rgba(196,22,110,0.6);  color:#c4166e;  background:rgba(196,22,110,0.1); }
-.p-purple  { border-color:rgba(123,47,160,0.6);  color:#9b5fd0;  background:rgba(123,47,160,0.1); }
-.p-splat   { border-color:rgba(232,92,138,0.6);  color:#e85c8a;  background:rgba(232,92,138,0.1); }
-
-/* ── PROJECTS ── */
-.projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:20px; }
-.proj-card { padding:32px; display:flex; flex-direction:column; gap:16px; text-decoration:none; color:inherit; }
-.proj-topbar { position:absolute; top:0; left:0; right:0; height:2px; border-radius:14px 14px 0 0; background:linear-gradient(90deg,#c0152a,#e8197a,#7b2fa0); opacity:0; transition:opacity 0.3s; z-index:2; }
-.proj-card:hover .proj-topbar { opacity:1; }
-.proj-num { font-family:'Instrument Serif',serif; font-size:44px; font-style:italic; color:rgba(255,255,255,0.04); line-height:1; position:absolute; top:20px; right:24px; }
-.proj-tags { display:flex; gap:6px; flex-wrap:wrap; }
-.proj-tag { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:3px 9px; border-radius:5px; border:1px solid #5a2a38; color:#8a6470; }
-.proj-title { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; line-height:1.3; }
-.proj-desc { font-size:13px; color:#8a6470; line-height:1.85; flex:1; }
-.findings { display:flex; flex-direction:column; gap:9px; margin-top:4px; }
-.finding { display:flex; align-items:flex-start; gap:10px; font-size:12px; color:#8a6470; line-height:1.6; }
-.fdot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:6px; }
-.proj-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid #2e1820; font-size:12px; margin-top:auto; }
-.proj-link { display:flex; align-items:center; gap:6px; color:#c0152a; font-weight:500; text-decoration:none; transition:gap 0.2s; }
-.proj-link:hover { gap:10px; }
-.badge-done { font-size:11px; color:#c8f0b0; border:1px solid rgba(180,230,150,0.35); border-radius:5px; padding:3px 9px; background:rgba(180,230,150,0.06); }
-.badge-wip  { font-size:11px; color:#e85c8a;  border:1px solid rgba(232,92,138,0.35);  border-radius:5px; padding:3px 9px; background:rgba(232,92,138,0.06); }
-.placeholder { border-style:dashed; opacity:0.5; }
-
-/* ── CONTACT ── */
-.contact-inner { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
-.contact-links { display:flex; flex-direction:column; gap:12px; }
-.c-link { display:flex; align-items:center; gap:16px; padding:16px 20px; text-decoration:none; color:#f0e4e8; transition:transform 0.25s; }
-.c-link:hover { transform:translateX(5px); }
-.c-ico { width:38px; height:38px; border-radius:9px; border:1.5px solid #5a2a38; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-.c-title { font-family:'Syne',sans-serif; font-weight:600; font-size:13px; margin-bottom:2px; }
-.c-val { font-size:12px; color:#8a6470; }
-.c-right-title { font-family:'Instrument Serif',serif; font-size:28px; margin-bottom:12px; font-style:italic; }
-.c-right-text { font-size:13px; color:#8a6470; line-height:1.85; margin-bottom:24px; }
-
-/* ── FOOTER ── */
-footer { padding:32px 0; border-top:1.5px solid #2e1820; }
-footer .wrapper { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8a6470; }
-.f-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color:#c0152a; }
-
-/* ── FADE IN ── */
-.fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.65s ease, transform 0.65s ease; }
-.fade-up.visible { opacity:1; transform:translateY(0); }
-
-@media(max-width:768px){
-  .hero-inner { grid-template-columns:1fr; }
-  .hero-card  { display:none; }
-  .contact-inner { grid-template-columns:1fr; }
-  .nav-links { display:none; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jannat-E-Nur Lisa</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
-<canvas id="sparkle-canvas"></canvas>
+  <canvas id="sparkle-canvas"></canvas>
 
-<!-- NAV -->
-<nav>
-  <div class="wrapper">
-    <a href="#hero" class="nav-logo">Lisa Here 🍀</a>
-    <ul class="nav-links">
-      <li><a href="#education">Education</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <a href="#contact" class="btn btn-red" style="padding:8px 18px;font-size:12px;">Say Hello →</a>
-  </div>
-</nav>
+  <!-- NAV -->
+  <nav>
+    <div class="wrapper">
+      <a href="#hero" class="nav-logo">Lisa Here 🍀</a>
+      <ul class="nav-links">
+        <li><a href="#education">Education</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#contact" class="btn btn-red" style="padding:8px 18px;font-size:12px;">Say Hello →</a>
+    </div>
+  </nav>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="wrapper">
-    <div class="hero-inner">
-      <div>
-        <div class="hero-tag fade-up"><span class="dot-pulse"></span>Open to opportunities</div>
-        <h1 class="hero-name fade-up">Jannat&#8209;E&#8209;Nur<br/><em>Lisa.</em></h1>
-        <p class="hero-sub fade-up">CSE Graduate · Web Developer & Data Analyst</p>
-        <p class="hero-bio fade-up">Computer Science &amp; Engineering graduate 
-          who builds for the web and thinks in data. I create clean, functional websites 
-          for small businesses and personal brands and I bring an analytical eye to everything 
-          I build.</p>
-        <div class="hero-cta fade-up">
-          <a href="#projects" class="btn btn-red">View Projects →</a>
-          <a href="#contact" class="btn btn-out">Get in Touch</a>
-        </div>
-      </div>
-
-      <!-- hero card: hot pink vinyl -->
-      <div class="hero-card box box-pink fade-up">
-        <div class="avatar">
-          <img src="assets/images/lisa .jpeg" alt="Lisa"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/>
-          <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">L</span>
-        </div>
+  <!-- HERO -->
+  <section id="hero">
+    <div class="wrapper">
+      <div class="hero-inner">
         <div>
-          <div class="card-name">Jannat-E-Nur</div>
-          
-        </div>
-        <div class="hr"></div>
-        <div class="stat"><span class="stat-l">Degree</span><span class="stat-v">B.Sc. CSE</span></div>
-        <div class="stat"><span class="stat-l">Graduated</span><span class="stat-v">Feb 2026</span></div>
-        
-        <div class="hr"></div>
-        <div class="badge"><span class="dot-pulse"></span>Building portfolio projects</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<div class="marquee-bar">
-  <div class="marquee-track">
-    <span class="m-item">Python <span class="m-sep"></span></span>
-    <span class="m-item">SQL <span class="m-sep"></span></span>
-    <span class="m-item">HTML <span class="m-sep"></span></span>
-    <span class="m-item">CSS  <span class="m-sep"></span></span>
-    <span class="m-item">JavaScript <span class="m-sep"></span></span>
-    <span class="m-item">Pandas <span class="m-sep"></span></span>
-    <span class="m-item">Seaborn <span class="m-sep"></span></span>
-    <span class="m-item">Behavioral Analytics <span class="m-sep"></span></span>
-    <span class="m-item">Data Storytelling <span class="m-sep"></span></span>
-    <span class="m-item">Google Sheets <span class="m-sep"></span></span>
-    <span class="m-item">NumPy <span class="m-sep"></span></span>
-    <span class="m-item">Consumer Psychology <span class="m-sep"></span></span>
-    <span class="m-item">Matplotlib <span class="m-sep"></span></span>
-    <span class="m-item">Business Intelligence <span class="m-sep"></span></span>
-    <span class="m-item">Python <span class="m-sep"></span></span>
-    <span class="m-item">SQL <span class="m-sep"></span></span>
-    <span class="m-item">HTML <span class="m-sep"></span></span>
-    <span class="m-item">CSS  <span class="m-sep"></span></span>
-    <span class="m-item">JavaScript <span class="m-sep"></span></span>
-    <span class="m-item">Pandas <span class="m-sep"></span></span>
-    <span class="m-item">Seaborn <span class="m-sep"></span></span>
-    <span class="m-item">Behavioral Analytics <span class="m-sep"></span></span>
-    <span class="m-item">Data Storytelling <span class="m-sep"></span></span>
-    <span class="m-item">Google Sheets <span class="m-sep"></span></span>
-    <span class="m-item">NumPy <span class="m-sep"></span></span>
-    <span class="m-item">Consumer Psychology <span class="m-sep"></span></span>
-    <span class="m-item">Matplotlib <span class="m-sep"></span></span>
-    <span class="m-item">Business Intelligence <span class="m-sep"></span></span>
-  </div>
-</div>
-
-<!-- EDUCATION -->
-<section id="education">
-  <div class="wrapper">
-    <p class="sec-label fade-up">// 01 — Education</p>
-    <h2 class="sec-title fade-up">Where it all <em>began.</em></h2>
-    <div class="edu-grid">
-
-      <!-- silver vinyl -->
-      <div class="bar box box-silver fade-up">
-        <div class="bar-ico">🎓</div>
-        <div class="bar-body">
-          <div class="bar-title">B.Sc. in Computer Science &amp; Engineering</div>
-          <div class="bar-sub">European University of Bangladesh · Dhaka, Bangladesh</div>
-        </div>
-        <div class="bar-right"><strong>Feb 2026</strong><span>CSE</span></div>
-      </div>
-
-      <!-- clear vinyl -->
-      <div class="bar box box-clear fade-up">
-        <div class="bar-ico">📚</div>
-        <div class="bar-body">
-          <div class="bar-title">Higher Secondary Certificate (HSC)</div>
-          <div class="bar-sub">Dhamrai Hardinge High School &amp; College · Dhaka, Bangladesh</div>
-        </div>
-        <div class="bar-right"><strong>Science</strong></div>
-      </div>
-
-      <!-- magenta vinyl -->
-      <div class="bar box box-magenta fade-up">
-        <div class="bar-ico">🏫</div>
-        <div class="bar-body">
-          <div class="bar-title">Secondary School Certificate (SSC)</div>
-          <div class="bar-sub">Jyoti Vidya Niketon · Dhaka, Bangladesh</div>
-        </div>
-        <div class="bar-right"><strong>Science</strong></div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- EXPERIENCE -->
-<section id="experience">
-  <div class="wrapper">
-    <p class="sec-label fade-up">// 02 — Experience</p>
-    <h2 class="sec-title fade-up">Real-world <em>work.</em></h2>
-    <div class="exp-grid">
-
-      <!-- hot pink vinyl -->
-      <div class="exp-box box box-pink fade-up">
-        <div class="exp-stripe"></div>
-        <div class="exp-hd">
-          <div>
-            <div class="exp-title">Planning &amp; Development Intern</div>
-            <div class="exp-org">European University of Bangladesh</div>
+          <div class="hero-tag fade-up"><span class="dot-pulse"></span>Open to opportunities</div>
+          <h1 class="hero-name fade-up">Jannat&#8209;E&#8209;Nur<br /><em>Lisa.</em></h1>
+          <p class="hero-sub fade-up">CSE Graduate · Web Developer & Data Analyst</p>
+          <p class="hero-bio fade-up">Computer Science &amp; Engineering graduate
+            who loves building things for the web. I design and code clean,
+            responsive websites, focused on good structure, thoughtful design,
+            and smooth user experience.</p>
+          <div class="hero-cta fade-up">
+            <a href="#projects" class="btn btn-red">View Projects →</a>
+            <a href="#contact" class="btn btn-out">Get in Touch</a>
           </div>
-          <div class="exp-date">Mar 2025 – Aug 2025</div>
         </div>
-        <p class="exp-desc">Supported strategic planning initiatives across departments. Collected, compiled, and organized institutional data to assist decision-making. Conducted usability testing of the university website and coordinated with faculty, staff, and external vendors.</p>
-      </div>
 
-      <!-- splatter vinyl -->
-      <div class="exp-box box box-splat fade-up">
-        <div class="exp-stripe"></div>
-        <div class="exp-hd">
-          <div>
-            <div class="exp-title">Campus Ambassador &amp; Volunteer</div>
-            <div class="exp-org">UNDP Future Nation Project</div>
+        <div class="hero-card box box-pink fade-up">
+          <div class="avatar">
+            <img src="assets/images/lisa .jpeg" alt="Lisa"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">L</span>
           </div>
-          <div class="exp-date">Volunteer</div>
+          <div>
+            <div class="card-name">Jannat-E-Nur</div>
+          </div>
+          <div class="hr"></div>
+          <div class="stat"><span class="stat-l">Degree</span><span class="stat-v">B.Sc. CSE</span></div>
+          <div class="stat"><span class="stat-l">Graduated</span><span class="stat-v">Feb 2026</span></div>
+          <div class="hr"></div>
+          <div class="badge"><span class="dot-pulse"></span>Open to freelance & opportunities</div>
         </div>
-        <p class="exp-desc">Represented UNDP on campus, promoted sustainability and development initiatives, engaged students in awareness campaigns, and built networks between UNDP and the university community.</p>
       </div>
+    </div>
+  </section>
 
+  <!-- MARQUEE -->
+  <div class="marquee-bar">
+    <div class="marquee-track">
+      <span class="m-item">HTML <span class="m-sep"></span></span>
+      <span class="m-item">CSS <span class="m-sep"></span></span>
+      <span class="m-item">JavaScript <span class="m-sep"></span></span>
+      <span class="m-item">Responsive Design <span class="m-sep"></span></span>
+      <span class="m-item">Git &amp; GitHub <span class="m-sep"></span></span>
+      <span class="m-item">VS Code <span class="m-sep"></span></span>
+      <span class="m-item">Web Layouts <span class="m-sep"></span></span>
+      <span class="m-item">UI Design <span class="m-sep"></span></span>
+      <span class="m-item">Clean Code <span class="m-sep"></span></span>
+      <span class="m-item">HTML <span class="m-sep"></span></span>
+      <span class="m-item">CSS <span class="m-sep"></span></span>
+      <span class="m-item">JavaScript <span class="m-sep"></span></span>
+      <span class="m-item">Responsive Design <span class="m-sep"></span></span>
+      <span class="m-item">Git &amp; GitHub <span class="m-sep"></span></span>
+      <span class="m-item">VS Code <span class="m-sep"></span></span>
+      <span class="m-item">Web Layouts <span class="m-sep"></span></span>
+      <span class="m-item">UI Design <span class="m-sep"></span></span>
+      <span class="m-item">Clean Code <span class="m-sep"></span></span>
     </div>
   </div>
-</section>
 
-<!-- SKILLS — each box = one vinyl -->
-<section id="skills">
-  <div class="wrapper">
-    <p class="sec-label fade-up">// 03 — Skills</p>
-    <h2 class="sec-title fade-up">Tools of the <em>trade.</em></h2>
-    <div class="skills-grid">
-
-      <!-- 🔴 blood red vinyl -->
-      <div class="skill-box box box-red fade-up">
-        <div class="skill-hd"><span>🐍</span> Languages</div>
-        <div class="pills">
-          <span class="pill p-red">Python</span>
-          <span class="pill p-red">SQL</span>
-          <span class="pill p-red">HTML </span>
-          <span class="pill p-red">CSS</span>
-          <span class="pill p-red">JavaScript</span>
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="wrapper">
+      <p class="sec-label fade-up">// 01 — Education</p>
+      <h2 class="sec-title fade-up">Where it all <em>began.</em></h2>
+      <div class="edu-grid">
+        <div class="bar box box-silver fade-up">
+          <div class="bar-ico">🎓</div>
+          <div class="bar-body">
+            <div class="bar-title">B.Sc. in Computer Science &amp; Engineering</div>
+            <div class="bar-sub">European University of Bangladesh · Dhaka, Bangladesh</div>
+          </div>
+          <div class="bar-right"><strong>Feb 2026</strong><span>CSE</span></div>
+        </div>
+        <div class="bar box box-clear fade-up">
+          <div class="bar-ico">📚</div>
+          <div class="bar-body">
+            <div class="bar-title">Higher Secondary Certificate (HSC)</div>
+            <div class="bar-sub">Dhamrai Hardinge High School &amp; College · Dhaka, Bangladesh</div>
+          </div>
+          <div class="bar-right"><strong>Science</strong></div>
+        </div>
+        <div class="bar box box-magenta fade-up">
+          <div class="bar-ico">🏫</div>
+          <div class="bar-body">
+            <div class="bar-title">Secondary School Certificate (SSC)</div>
+            <div class="bar-sub">Jyoti Vidya Niketon · Dhaka, Bangladesh</div>
+          </div>
+          <div class="bar-right"><strong>Science</strong></div>
         </div>
       </div>
-
-      <!-- 🩷 hot pink vinyl -->
-      <div class="skill-box box box-pink fade-up">
-        <div class="skill-hd"><span>📦</span> Python Libraries</div>
-        <div class="pills">
-          <span class="pill p-pink">Pandas</span>
-          <span class="pill p-pink">NumPy</span>
-          <span class="pill p-pink">Matplotlib</span>
-          <span class="pill p-pink">Seaborn</span>
-        </div>
-      </div>
-
-      
-<!-- 🌸 splatter vinyl -->
-      <div class="skill-box box box-clear fade-up">
-        <div class="skill-hd"><span>🌐</span>Web Development</div>
-        <div class="pills">
-          <span class="pill p-splat">Responsive Design</span>
-          <span class="pill p-splat">Mobile-Friendly Layouts</span>
-          <span class="pill p-splat">Git </span>
-          <span class="pill p-splat">GitHub</span>
-          <span class="pill p-splat">VS Code</span>
-        </div>
-      </div>
-
-      
-      <!-- ⚪ silver vinyl -->
-      <div class="skill-box box box-silver fade-up">
-        <div class="skill-hd"><span>📊</span> Data &amp; Analytics</div>
-        <div class="pills">
-          <span class="pill p-silver">Data Cleaning</span>
-          <span class="pill p-silver">Data Analysis</span>
-          <span class="pill p-silver">Data Visualization</span>
-          <span class="pill p-silver">Excel / Google Sheets</span>
-        </div>
-      </div>
-
-      <!-- 🟣 purple vinyl -->
-      <div class="skill-box box box-purple fade-up">
-        <div class="skill-hd"><span>💼</span> Professional</div>
-        <div class="pills">
-          <span class="pill p-purple">Project Coordination</span>
-          <span class="pill p-purple">Critical Thinking</span>
-          <span class="pill p-purple">Report Writing</span>
-          <span class="pill p-purple">Communication</span>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- PROJECTS -->
-<section id="projects">
-  <div class="wrapper">
-    <p class="sec-label fade-up">// 04 — Projects</p>
-    <h2 class="sec-title fade-up">Things I've <em>built.</em></h2>
-    <div class="projects-grid">
-
-      <!-- 🔴 blood red vinyl -->
-      <a href="https://github.com/jannatenurlisa/Ecommerce-Churn-Analysis" target="_blank"
-         class="proj-card box box-red fade-up">
-        <div class="proj-topbar"></div>
-        <span class="proj-num">01</span>
-        <div class="proj-tags">
-          <span class="proj-tag">Python</span>
-          <span class="proj-tag">Pandas</span>
-          <span class="proj-tag">Seaborn</span>
-          <span class="proj-tag">Behavioral Segmentation</span>
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="wrapper">
+      <p class="sec-label fade-up">// 02 — Experience</p>
+      <h2 class="sec-title fade-up">Real-world <em>work.</em></h2>
+      <div class="exp-grid">
+        <div class="exp-box box box-pink fade-up">
+          <div class="exp-stripe"></div>
+          <div class="exp-hd">
+            <div>
+              <div class="exp-title">Planning &amp; Development Intern</div>
+              <div class="exp-org">European University of Bangladesh</div>
+            </div>
+            <div class="exp-date">Mar 2025 – Aug 2025</div>
+          </div>
+          <p class="exp-desc">Supported strategic planning initiatives across departments. Collected,
+            compiled, and organized institutional data to assist decision-making. Conducted usability
+            testing of the university website and coordinated with faculty, staff, and external vendors.</p>
         </div>
-        <div class="proj-title">E-Commerce Churn Analysis</div>
-        <p class="proj-desc">Analyzed 7 months of clickstream data (74,817 events · 1,000 users) to identify at-risk users <em>before</em> they fully churn — surfacing signals that spend-based monitoring misses entirely.</p>
-        <div class="findings">
-          <div class="finding"><div class="fdot" style="background:#c0152a"></div><span>At-risk users spend only $11 less than active users — invisible to spend monitoring alone</span></div>
-          <div class="finding"><div class="fdot" style="background:#e8197a"></div><span>186 "Quiet Loyal" users purchase above median frequency; 2 are top-10 spenders</span></div>
-          <div class="finding"><div class="fdot" style="background:#9b5fd0"></div><span>Intervention window is only 15 days — 7-day inactivity flagging is the only reliable early signal</span></div>
-        </div>
-        <div class="proj-footer">
-          <span class="proj-link">View on GitHub →</span>
-          <span class="badge-done">Completed</span>
-        </div>
-      </a>
-
-      <!-- 💗 magenta vinyl -->
-      <div class="proj-card box box-magenta placeholder fade-up">
-        <div class="proj-topbar"></div>
-        <span class="proj-num">02</span>
-        <div class="proj-tags"><span class="proj-tag">HTML</span><span class="proj-tag">Coming Soon</span></div>
-        <div class="proj-title">Web Project</div>
-        <p class="proj-desc">An upcoming HTML, CSS focused web project is currently in progress. Check back soon.</p>
-        <div class="proj-footer">
-          <span style="color:#8a6470;font-size:12px;">— In progress —</span>
-          <span class="badge-wip">Coming Soon</span>
+        <div class="exp-box box box-splat fade-up">
+          <div class="exp-stripe"></div>
+          <div class="exp-hd">
+            <div>
+              <div class="exp-title">Campus Ambassador &amp; Volunteer</div>
+              <div class="exp-org">UNDP Future Nation Project</div>
+            </div>
+            <div class="exp-date">Volunteer</div>
+          </div>
+          <p class="exp-desc">Represented UNDP on campus, promoted sustainability and development initiatives,
+            engaged students in awareness campaigns, and built networks between UNDP and the university
+            community.</p>
         </div>
       </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- CONTACT -->
-<section id="contact">
-  <div class="wrapper">
-    <p class="sec-label fade-up">// 05 — Contact</p>
-    <h2 class="sec-title fade-up">Let's <em>connect.</em></h2>
-    <div class="contact-inner">
-      <div class="contact-links fade-up">
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="wrapper">
+      <p class="sec-label fade-up">// 03 — Skills</p>
+      <h2 class="sec-title fade-up">Tools of the <em>trade.</em></h2>
+      <div class="skills-grid">
+        <div class="skill-box box box-red fade-up">
+          <div class="skill-hd"><span>🐍</span> Languages</div>
+          <div class="pills">
+            <span class="pill p-red">HTML</span>
+            <span class="pill p-red">CSS</span>
+            <span class="pill p-red">JavaScript</span>
+            <span class="pill p-red">Python</span>
+            <span class="pill p-red">SQL</span>
+          </div>
+        </div>
+        <div class="skill-box box box-pink fade-up">
+          <div class="skill-hd"><span>📦</span> Python Libraries</div>
+          <div class="pills">
+            <span class="pill p-pink">Pandas</span>
+            <span class="pill p-pink">NumPy</span>
+            <span class="pill p-pink">Matplotlib</span>
+            <span class="pill p-pink">Seaborn</span>
+          </div>
+        </div>
+        <div class="skill-box box box-clear fade-up">
+          <div class="skill-hd"><span>🌐</span> Web Development</div>
+          <div class="pills">
+            <span class="pill p-splat">Responsive Design</span>
+            <span class="pill p-splat">Mobile-Friendly Layouts</span>
+            <span class="pill p-splat">Git</span>
+            <span class="pill p-splat">GitHub</span>
+            <span class="pill p-splat">VS Code</span>
+          </div>
+        </div>
+        <div class="skill-box box box-silver fade-up">
+          <div class="skill-hd"><span>📊</span> Data &amp; Analytics</div>
+          <div class="pills">
+            <span class="pill p-silver">Data Cleaning</span>
+            <span class="pill p-silver">Data Analysis</span>
+            <span class="pill p-silver">Data Visualization</span>
+            <span class="pill p-silver">Excel / Google Sheets</span>
+          </div>
+        </div>
+        <div class="skill-box box box-purple fade-up">
+          <div class="skill-hd"><span>💼</span> Professional</div>
+          <div class="pills">
+            <span class="pill p-purple">Project Coordination</span>
+            <span class="pill p-purple">Critical Thinking</span>
+            <span class="pill p-purple">Report Writing</span>
+            <span class="pill p-purple">Communication</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- 🔴 red vinyl -->
-        <a href="mailto:jannatenurlisa@gmail.com" class="c-link box box-red">
-          <div class="c-ico">✉️</div>
-          <div><div class="c-title">Email</div><div class="c-val">jannatenurlisa@gmail.com</div></div>
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="wrapper">
+      <p class="sec-label fade-up">// 04 — Projects</p>
+      <h2 class="sec-title fade-up">Things I've <em>built.</em></h2>
+      <div class="projects-grid">
+        <a href="https://github.com/jannatenurlisa/Ecommerce-Churn-Analysis" target="_blank"
+          class="proj-card box box-red fade-up">
+          <div class="proj-topbar"></div>
+          <span class="proj-num">01</span>
+          <div class="proj-tags">
+            <span class="proj-tag">Python</span>
+            <span class="proj-tag">Pandas</span>
+            <span class="proj-tag">Seaborn</span>
+            <span class="proj-tag">Behavioral Segmentation</span>
+          </div>
+          <div class="proj-title">E-Commerce Churn Analysis</div>
+          <p class="proj-desc">Analyzed 7 months of clickstream data (74,817 events · 1,000 users) to identify
+            at-risk users <em>before</em> they fully churn — surfacing signals that spend-based monitoring
+            misses entirely.</p>
+          <div class="findings">
+            <div class="finding">
+              <div class="fdot" style="background:#c0152a"></div><span>At-risk users spend only $11 less
+                than active users — invisible to spend monitoring alone</span>
+            </div>
+            <div class="finding">
+              <div class="fdot" style="background:#e8197a"></div><span>186 "Quiet Loyal" users purchase
+                above median frequency; 2 are top-10 spenders</span>
+            </div>
+            <div class="finding">
+              <div class="fdot" style="background:#9b5fd0"></div><span>Intervention window is only 15 days
+                — 7-day inactivity flagging is the only reliable early signal</span>
+            </div>
+          </div>
+          <div class="proj-footer">
+            <span class="proj-link">View on GitHub →</span>
+            <span class="badge-done">Completed</span>
+          </div>
         </a>
-
-        <!-- ⚪ silver vinyl -->
-        <a href="https://github.com/jannatenurlisa" target="_blank" class="c-link box box-silver">
-          <div class="c-ico">🐙</div>
-          <div><div class="c-title">GitHub</div><div class="c-val">github.com/jannatenurlisa</div></div>
-        </a>
-
-        <!-- 🩷 pink vinyl -->
-        <a href="https://www.linkedin.com/in/jannatenurlisa/" target="_blank" class="c-link box box-pink">
-          <div class="c-ico">💼</div>
-          <div><div class="c-title">LinkedIn</div><div class="c-val">linkedin.com/in/jannatenurlisa</div></div>
-        </a>
-
+        <div class="proj-card box box-magenta placeholder fade-up">
+          <div class="proj-topbar"></div>
+          <span class="proj-num">02</span>
+          <div class="proj-tags"><span class="proj-tag">HTML</span><span class="proj-tag">Coming Soon</span>
+          </div>
+          <div class="proj-title">Web Project</div>
+          <p class="proj-desc">An upcoming HTML, CSS focused web project is currently in progress. Check back
+            soon.</p>
+          <div class="proj-footer">
+            <span style="color:#8a6470;font-size:12px;">— In progress —</span>
+            <span class="badge-wip">Coming Soon</span>
+          </div>
+        </div>
       </div>
-
-      <!-- 🟣 purple vinyl -->
-      <div class="box box-purple fade-up" style="padding:36px;">
-        <div class="c-right-title">Open to work &amp; collaboration.</div>
-        <p class="c-right-text">I'm actively looking for web development opportunities, internships, 
-          and freelance work. I also bring a data background to projects that need both, design sense 
-          and analytical thinking. Feel free to reach out.<br/><br/>Feel free to reach out if you'd like 
-          to collaborate, chat about data, or explore what we could build together.</p>
-        <a href="mailto:jannatenurlisa@gmail.com" class="btn btn-red">Send a Message →</a>
-      </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="wrapper">
-    <span class="f-logo">Lisa ☁️</span>
-    <span>© 2026 Jannat-E-Nur · Built with intention.</span>
-    <span style="color:#c0152a">Everything Goes 🌿</span>
-  </div>
-</footer>
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrapper">
+      <p class="sec-label fade-up">// 05 — Contact</p>
+      <h2 class="sec-title fade-up">Let's <em>connect.</em></h2>
+      <div class="contact-inner">
+        <div class="contact-links fade-up">
+          <a href="mailto:jannatenurlisa@gmail.com" class="c-link box box-red">
+            <div class="c-ico">✉️</div>
+            <div>
+              <div class="c-title">Email</div>
+              <div class="c-val">jannatenurlisa@gmail.com</div>
+            </div>
+          </a>
+          <a href="https://github.com/jannatenurlisa" target="_blank" class="c-link box box-silver">
+            <div class="c-ico">🐙</div>
+            <div>
+              <div class="c-title">GitHub</div>
+              <div class="c-val">github.com/jannatenurlisa</div>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/in/jannatenurlisa/" target="_blank" class="c-link box box-pink">
+            <div class="c-ico">💼</div>
+            <div>
+              <div class="c-title">LinkedIn</div>
+              <div class="c-val">linkedin.com/in/jannatenurlisa</div>
+            </div>
+          </a>
+        </div>
+        <div class="box box-purple fade-up" style="padding:36px;">
+          <div class="c-right-title">Open to work &amp; collaboration.</div>
+          <p class="c-right-text">I'm actively looking for web development opportunities, internships,
+            and freelance work. I also bring a data background to projects that need both, design sense
+            and analytical thinking. Feel free to reach out.<br /><br />Feel free to reach out if you'd like
+            to collaborate, chat about data, or explore what we could build together.</p>
+          <a href="mailto:jannatenurlisa@gmail.com" class="btn btn-red">Send a Message →</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-// ── SPARKLE — all 7 vinyl colors ──
-const canvas = document.getElementById('sparkle-canvas');
-const ctx    = canvas.getContext('2d');
-let W, H, P  = [];
-const COLS   = [
-  'rgba(192,21,42,',   // blood red
-  'rgba(232,25,122,',  // hot pink
-  'rgba(184,184,204,', // silver
-  'rgba(210,228,240,', // clear
-  'rgba(196,22,110,',  // magenta
-  'rgba(123,47,160,',  // purple
-  'rgba(232,92,138,'   // splatter
-];
-function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-function mkP(){ return { x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.4+0.3, a:Math.random()*0.55+0.1, s:Math.random()*0.24+0.04, d:(Math.random()-0.5)*0.14, tw:Math.random()*0.016+0.004, c:COLS[Math.floor(Math.random()*COLS.length)] }; }
-function init(){ P = Array.from({length:130}, mkP); }
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  P.forEach(p=>{
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle = p.c+p.a+')'; ctx.fill();
-    p.y-=p.s; p.x+=p.d;
-    p.a+=(Math.random()-0.5)*p.tw;
-    p.a=Math.max(0.05,Math.min(0.72,p.a));
-    if(p.y<-4){ p.y=H+4; p.x=Math.random()*W; }
-  });
-  requestAnimationFrame(draw);
-}
-resize(); init(); draw();
-addEventListener('resize', resize);
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrapper">
+      <span class="f-logo">Lisa ☁️</span>
+      <span>© 2026 Jannat-E-Nur · Built with intention.</span>
+      <span style="color:#c0152a">Everything Goes 🌿</span>
+    </div>
+  </footer>
 
-// ── SCROLL FADE ──
-const obs = new IntersectionObserver(es => es.forEach(e=>{
-  if(e.isIntersecting) e.target.classList.add('visible');
-}), {threshold:0.08});
-document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
-
-// ── TILT + cursor-tracked glow ──
-document.querySelectorAll('.box').forEach(box=>{
-  box.addEventListener('mousemove', e=>{
-    const r  = box.getBoundingClientRect();
-    const dx = (e.clientX-(r.left+r.width/2))  / (r.width/2);
-    const dy = (e.clientY-(r.top+r.height/2))  / (r.height/2);
-    box.style.transform = `perspective(700px) rotateX(${-dy*6}deg) rotateY(${dx*6}deg) translate(${dx*5}px,${dy*5}px)`;
-    box.style.setProperty('--gx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
-    box.style.setProperty('--gy', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
-  });
-  box.addEventListener('mouseleave',()=>{
-    box.style.transform='';
-    box.style.removeProperty('--gx');
-    box.style.removeProperty('--gy');
-  });
-});
-</script>
+  <script src="script.js"></script>
 </body>
-</html>
-</script>
-</body>
+
 </html>

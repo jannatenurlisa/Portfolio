@@ -1,72 +1,53 @@
-
-// Sparkles Background
-window.addEventListener('DOMContentLoaded', () => {
-    const sparkleCount = 111;
-    const container = document.querySelector('.sparkles');
-
-    for (let i = 0; i < sparkleCount; i++) {
-        const sparkle = document.createElement('div');
-        sparkle.classList.add('sparkle');
-
-        sparkle.style.top = Math.random() * 100 + 'vh';
-        sparkle.style.left = Math.random() * 100 + 'vw';
-        sparkle.style.width = sparkle.style.height = (Math.random() * 2 + 1) + 'px';
-        sparkle.style.animationDuration = (Math.random() * 3 + 2) + 's';
-        sparkle.style.background = 'rgba(255, 255, 255, ' + (Math.random() * 0.6 + 0.2) + ')';
-
-        container.appendChild(sparkle);
-    }
-});
-
-
-// Sparkles
-
-const brandName = document.querySelector('.brand-name');
-
-const rect = brandName.getBoundingClientRect();
-const sparkleCount = 12;
-for (let i = 0; i < sparkleCount; i++) {
-    const sparkle = document.createElement('div');
-    sparkle.classList.add('sparkle');
-    sparkle.style.width = sparkle.style.height = (Math.random() * 4 + 2) + 'px';
-    sparkle.style.top = rect.top + rect.height / 2 + (Math.random() * 20 - 10) + 'px';
-    sparkle.style.left = rect.left + rect.width / 2 + (Math.random() * 20 - 10) + 'px';
-    sparkle.style.background = 'rgba(214,173,96,0.9)';
-    sparkle.style.animationDuration = (Math.random() * 1 + 0.8) + 's';
-    document.body.appendChild(sparkle);
-    setTimeout(() => sparkle.remove(), 800);
-};
-
-
-// Smooth Scroll
-
-const topBar = document.querySelector('.top-bar');
-const topBarHeight = topBar.offsetHeight;
-
-const navLinks = document.querySelectorAll('.nav-list a');
-const sections = document.querySelectorAll('.content-section');
-
-// Smooth scroll
-navLinks.forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        const targetPosition = target.offsetTop - topBarHeight - 10;
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-        });
+// ── SPARKLE ──
+const canvas = document.getElementById('sparkle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, P = [];
+const COLS = [
+    'rgba(192,21,42,',
+    'rgba(232,25,122,',
+    'rgba(184,184,204,',
+    'rgba(210,228,240,',
+    'rgba(196,22,110,',
+    'rgba(123,47,160,',
+    'rgba(232,92,138,'
+];
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+function mkP() { return { x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.4 + 0.3, a: Math.random() * 0.55 + 0.1, s: Math.random() * 0.24 + 0.04, d: (Math.random() - 0.5) * 0.14, tw: Math.random() * 0.016 + 0.004, c: COLS[Math.floor(Math.random() * COLS.length)] }; }
+function init() { P = Array.from({ length: 130 }, mkP); }
+function draw() {
+    ctx.clearRect(0, 0, W, H);
+    P.forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.c + p.a + ')'; ctx.fill();
+        p.y -= p.s; p.x += p.d;
+        p.a += (Math.random() - 0.5) * p.tw;
+        p.a = Math.max(0.05, Math.min(0.72, p.a));
+        if (p.y < -4) { p.y = H + 4; p.x = Math.random() * W; }
     });
-});
+    requestAnimationFrame(draw);
+}
+resize(); init(); draw();
+addEventListener('resize', resize);
 
-// Highlight active nav link on scroll
-window.addEventListener('scroll', () => {
-    let scrollPos = window.scrollY + topBarHeight + 20;
-    sections.forEach(section => {
-        if (scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
-            navLinks.forEach(link => link.classList.remove('active'));
-            const activeLink = document.querySelector(`.nav-list a[href="#${section.id}"]`);
-            if (activeLink) activeLink.classList.add('active');
-        }
+// ── SCROLL FADE ──
+const obs = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+}), { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// ── TILT + cursor-tracked glow ──
+document.querySelectorAll('.box').forEach(box => {
+    box.addEventListener('mousemove', e => {
+        const r = box.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        box.style.transform = `perspective(700px) rotateX(${-dy * 6}deg) rotateY(${dx * 6}deg) translate(${dx * 5}px,${dy * 5}px)`;
+        box.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+        box.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    });
+    box.addEventListener('mouseleave', () => {
+        box.style.transform = '';
+        box.style.removeProperty('--gx');
+        box.style.removeProperty('--gy');
     });
 });
