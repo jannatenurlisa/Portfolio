@@ -12,8 +12,8 @@ const COLS = [
     'rgba(232,92,138,'
 ];
 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-function mkP() { return { x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.4 + 0.3, a: Math.random() * 0.55 + 0.1, s: Math.random() * 0.24 + 0.04, d: (Math.random() - 0.5) * 0.14, tw: Math.random() * 0.016 + 0.004, c: COLS[Math.floor(Math.random() * COLS.length)] }; }
-function init() { P = Array.from({ length: 130 }, mkP); }
+function mkP() { return { x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.6 + 0.4, a: Math.random() * 0.6 + 0.3, s: Math.random() * 0.24 + 0.04, d: (Math.random() - 0.5) * 0.14, tw: Math.random() * 0.016 + 0.004, c: COLS[Math.floor(Math.random() * COLS.length)] }; }
+function init() { P = Array.from({ length: 220 }, mkP); }
 function draw() {
     ctx.clearRect(0, 0, W, H);
     P.forEach(p => {
@@ -21,7 +21,7 @@ function draw() {
         ctx.fillStyle = p.c + p.a + ')'; ctx.fill();
         p.y -= p.s; p.x += p.d;
         p.a += (Math.random() - 0.5) * p.tw;
-        p.a = Math.max(0.05, Math.min(0.72, p.a));
+        p.a = Math.max(0.2, Math.min(0.95, p.a));
         if (p.y < -4) { p.y = H + 4; p.x = Math.random() * W; }
     });
     requestAnimationFrame(draw);
